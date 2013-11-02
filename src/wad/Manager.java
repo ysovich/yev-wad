@@ -45,9 +45,9 @@ public class Manager {
 	private static final long HOUR = 60 * MINUTE;
 	private static final long DAY = 24 * HOUR;
 	private static final long YEAR = 365 * DAY;
-	private long interval[] = { 28 * DAY - 12 * HOUR, 7 * DAY - 12 * HOUR, 12 * HOUR, 60 * MINUTE,
-			1 * MINUTE, 0 };
-	public static final String intervalLbl[] = { "Y", "M", "W", "D", "H", "M" };
+	private long interval[] = { 28 * DAY - 12 * HOUR, 7 * DAY - 12 * HOUR, 3 * DAY - 12 * HOUR,
+			12 * HOUR, 60 * MINUTE, 1 * MINUTE, 0 };
+	public static final String intervalLbl[] = { "Y", "M", "W", "T", "D", "H", "M" };
 	private String WORDS_PATH;
 	private String ATTEMPTS_PATH;
 	private String DICT_PATH;
@@ -316,9 +316,8 @@ public class Manager {
 				WordHistory wordHist = historyMap.get(attempt.wordTitle);
 				for (Attempt prevAttempt : wordHist.attemptList) {
 					if (prevAttempt.correct && prevAttempt.date.before(yearAgo)) {
-						graduated =
-								JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
-										"Graduated", JOptionPane.YES_NO_OPTION);
+						graduated = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
+								"Graduated", JOptionPane.YES_NO_OPTION);
 						break;
 					}
 				}
