@@ -45,8 +45,8 @@ public class Manager {
 	private static final long HOUR = 60 * MINUTE;
 	private static final long DAY = 24 * HOUR;
 	private static final long YEAR = 365 * DAY;
-	private static final long interval[] = { 28 * DAY - 12 * HOUR, 7 * DAY - 12 * HOUR, 12 * HOUR,
-			60 * MINUTE, 1 * MINUTE, 0 };
+	private long interval[] = { 28 * DAY - 12 * HOUR, 7 * DAY - 12 * HOUR, 12 * HOUR, 60 * MINUTE,
+			1 * MINUTE, 0 };
 	public static final String intervalLbl[] = { "Y", "M", "W", "D", "H", "M" };
 	private String WORDS_PATH;
 	private String ATTEMPTS_PATH;
@@ -65,6 +65,13 @@ public class Manager {
 			ATTEMPTS_PATH = prop.getProperty("attempts");
 			DICT_PATH = prop.getProperty("dict");
 			DICT_DOWN_PATH = prop.getProperty("down");
+			String intervalProp = prop.getProperty("interval");
+			if (intervalProp != null) {
+				String[] intervalStr = intervalProp.split(",");
+				for (int i = 0; i < intervalStr.length; ++i) {
+					interval[i] = Math.round(Float.parseFloat(intervalStr[i]) * DAY);
+				}
+			}
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
@@ -309,8 +316,9 @@ public class Manager {
 				WordHistory wordHist = historyMap.get(attempt.wordTitle);
 				for (Attempt prevAttempt : wordHist.attemptList) {
 					if (prevAttempt.correct && prevAttempt.date.before(yearAgo)) {
-						graduated = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
-								"Graduated", JOptionPane.YES_NO_OPTION);
+						graduated =
+								JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
+										"Graduated", JOptionPane.YES_NO_OPTION);
 						break;
 					}
 				}
