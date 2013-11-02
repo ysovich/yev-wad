@@ -163,7 +163,8 @@ public class FrameMain extends JFrame {
 	private void onShow(ActionEvent e) {
 		jTextTitle.setText(word.title);
 		jTextExample.setText(word.example);
-		if (jTextResp.getText().equals(word.title)) {
+		String title = word.title.split("\\d")[0];
+		if (jTextResp.getText().equals(title)) {
 			jTextResp.setForeground(new Color(0, 192, 0));
 		}
 		else {
