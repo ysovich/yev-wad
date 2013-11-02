@@ -416,6 +416,10 @@ public class Manager {
 					if (now.getTime() - hist.attemptList.get(0).date.getTime() > YEAR + 12 * HOUR) {
 						candList.add(hist.word);
 					}
+					else if (now.getTime() - hist.attemptList.get(hist.attemptList.size() - 1).date.getTime() > DAY
+							* 90 + 12 * HOUR) {
+						candList.add(hist.word);
+					}
 					else {
 						doneList.add(hist.word);
 					}
