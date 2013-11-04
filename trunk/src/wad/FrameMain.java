@@ -37,6 +37,7 @@ public class FrameMain extends JFrame {
 	private final JLabel jLabelOld = new JLabel();
 	private final JButton jButtonMine = new JButton("Mine");
 	private final JTextArea jTextMine = new JTextArea();
+	private final JButton jButtonUpdate = new JButton("Update");
 
 	public FrameMain(String configPath) {
 		manager = new Manager(configPath);
@@ -139,6 +140,14 @@ public class FrameMain extends JFrame {
 		jTextMine.setBounds(new Rectangle(545, 130, 120, 410));
 		jTextMine.setFont(new Font("Tahoma", 0, 16));
 		jTextMine.setLineWrap(true);
+		jButtonUpdate.setText("Update");
+		jButtonUpdate.setBounds(new Rectangle(545, 25, 80, 25));
+		jButtonUpdate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onUpdate(e);
+			}
+		});
 
 		this.getContentPane().add(jLabelOld, null);
 		this.getContentPane().add(jTextOld, null);
@@ -158,6 +167,7 @@ public class FrameMain extends JFrame {
 		this.getContentPane().add(jLabelTitle, null);
 		this.getContentPane().add(jButtonMine, null);
 		this.getContentPane().add(jTextMine, null);
+		this.getContentPane().add(jButtonUpdate, null);
 	}
 
 	private void onShow(ActionEvent e) {
@@ -254,5 +264,12 @@ public class FrameMain extends JFrame {
 	private void onMine(ActionEvent e) {
 		String selectedWords = manager.mine();
 		jTextMine.setText(selectedWords);
+	}
+
+	private void onUpdate(ActionEvent e) {
+		String title = jTextTitle.getText();
+		String newTitle = jTextResp.getText();
+		manager.updateTitle(title, newTitle);
+		jTextTitle.setText(jTextResp.getText());
 	}
 }

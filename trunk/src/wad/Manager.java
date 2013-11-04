@@ -316,8 +316,9 @@ public class Manager {
 				WordHistory wordHist = historyMap.get(attempt.wordTitle);
 				for (Attempt prevAttempt : wordHist.attemptList) {
 					if (prevAttempt.correct && prevAttempt.date.before(yearAgo)) {
-						graduated = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
-								"Graduated", JOptionPane.YES_NO_OPTION);
+						graduated =
+								JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
+										"Graduated", JOptionPane.YES_NO_OPTION);
 						break;
 					}
 				}
@@ -576,6 +577,139 @@ public class Manager {
 			System.out.println(e.toString());
 		}
 		return selectedWords.toString();
+	}
+
+	void updateTitle(String wordTitle, String newTitle) {
+		FileInputStream istr = null;
+		FileOutputStream ostr = null;
+		try {
+			istr = new FileInputStream(WORDS_PATH);
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			docFactory.setNamespaceAware(true);
+			DocumentBuilder builder = docFactory.newDocumentBuilder();
+			Document xmlDoc = builder.parse(new InputSource(istr));
+			istr.close();
+			istr = null;
+
+			XPathFactory factory = XPathFactory.newInstance();
+			XPath xpath = factory.newXPath();
+
+			Element wordEl = null;
+			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
+			if (nodeList != null) {
+				for (int i = 0; i < nodeList.getLength(); ++i) {
+					Element el = (Element) nodeList.item(i);
+					if (wordTitle.equals(el.getAttribute("title"))) {
+						wordEl = el;
+						break;
+					}
+				}
+			}
+
+			if (wordEl != null) {
+				wordEl.setAttribute("title", newTitle);
+
+				ostr = new FileOutputStream(WORDS_PATH);
+				DOMSource domSrc = new DOMSource(xmlDoc);
+				TransformerFactory tFactory = TransformerFactory.newInstance();
+				Transformer transformer = tFactory.newTransformer();
+				transformer.transform(domSrc, new StreamResult(ostr));
+				ostr.close();
+				ostr = null;
+
+				updateAllAttempts(wordTitle, newTitle);
+
+				load();
+			}
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (SAXException e) {
+			throw new RuntimeException(e);
+		}
+		catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+		catch (XPathExpressionException e) {
+			throw new RuntimeException(e);
+		}
+		catch (TransformerException e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if (istr != null) {
+					istr.close();
+				}
+				if (istr != null) {
+					ostr.close();
+				}
+			}
+			catch (IOException e) {
+				new RuntimeException(e);
+			}
+		}
+	}
+
+	public void updateAllAttempts(String wordTitle, String newTitle) {
+		FileInputStream istr = null;
+		FileOutputStream ostr = null;
+		try {
+			istr = new FileInputStream(ATTEMPTS_PATH);
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			docFactory.setNamespaceAware(true);
+			DocumentBuilder builder = docFactory.newDocumentBuilder();
+			Document xmlDoc = builder.parse(new InputSource(istr));
+			istr.close();
+			istr = null;
+
+			Element docEl = xmlDoc.getDocumentElement();
+
+			NodeList nodeList = docEl.getChildNodes();
+			for (int i = 0; i < nodeList.getLength(); ++i) {
+				Node node = nodeList.item(i);
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+					Element element = (Element) node;
+					if (wordTitle.equals(element.getAttribute("wordTitle"))) {
+						element.setAttribute("wordTitle", newTitle);
+					}
+				}
+			}
+
+			ostr = new FileOutputStream(ATTEMPTS_PATH);
+			DOMSource domSrc = new DOMSource(xmlDoc);
+			TransformerFactory tFactory = TransformerFactory.newInstance();
+			Transformer transformer = tFactory.newTransformer();
+			transformer.transform(domSrc, new StreamResult(ostr));
+			ostr.close();
+			ostr = null;
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (SAXException e) {
+			throw new RuntimeException(e);
+		}
+		catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+		catch (TransformerException e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if (istr != null) {
+					istr.close();
+				}
+				if (istr != null) {
+					ostr.close();
+				}
+			}
+			catch (IOException e) {
+				new RuntimeException(e);
+			}
+		}
 	}
 
 }
