@@ -11,6 +11,7 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -267,8 +268,12 @@ public class FrameMain extends JFrame {
 	}
 
 	private void onUpdate(ActionEvent e) {
-		String title = jTextTitle.getText();
-		String newTitle = jTextResp.getText();
+		String title = jTextTitle.getText().trim();
+		String newTitle = jTextResp.getText().trim();
+		if (title.isEmpty() || newTitle.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "Title is empty", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		manager.updateTitle(title, newTitle);
 		jTextTitle.setText(jTextResp.getText());
 	}
