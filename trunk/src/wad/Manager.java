@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,8 +46,7 @@ public class Manager {
 	private static final long HOUR = 60 * MINUTE;
 	private static final long DAY = 24 * HOUR;
 	private static final long YEAR = 365 * DAY;
-	private long interval[] = { 28 * DAY - 12 * HOUR, 7 * DAY - 12 * HOUR, 3 * DAY - 12 * HOUR,
-			12 * HOUR, 60 * MINUTE, 1 * MINUTE, 0 };
+	private static final long interval[] = { 28 * DAY, 7 * DAY, 3 * DAY, DAY, HOUR, MINUTE, 0 };
 	public static final String intervalLbl[] = { "Y", "M", "W", "T", "D", "H", "M" };
 	private String WORDS_PATH;
 	private String ATTEMPTS_PATH;
@@ -65,13 +65,6 @@ public class Manager {
 			ATTEMPTS_PATH = prop.getProperty("attempts");
 			DICT_PATH = prop.getProperty("dict");
 			DICT_DOWN_PATH = prop.getProperty("down");
-			String intervalProp = prop.getProperty("interval");
-			if (intervalProp != null) {
-				String[] intervalStr = intervalProp.split(",");
-				for (int i = 0; i < intervalStr.length; ++i) {
-					interval[i] = Math.round(Float.parseFloat(intervalStr[i]) * DAY);
-				}
-			}
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
@@ -316,9 +309,8 @@ public class Manager {
 				WordHistory wordHist = historyMap.get(attempt.wordTitle);
 				for (Attempt prevAttempt : wordHist.attemptList) {
 					if (prevAttempt.correct && prevAttempt.date.before(yearAgo)) {
-						graduated =
-								JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
-										"Graduated", JOptionPane.YES_NO_OPTION);
+						graduated = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
+								"Graduated", JOptionPane.YES_NO_OPTION);
 						break;
 					}
 				}
@@ -383,6 +375,23 @@ public class Manager {
 		}
 	}
 
+	/**
+	 * Selects the next word to present.
+	 * <ol>
+	 * <li>find dur - the longest time between attempts<br>
+	 * example: |-2min-|--2hr--|---2d---| dur=2d
+	 * <li>if dur > largest interval (1 month) -> Y,<br>
+	 * add to candList if time since first attempt > 1 year, or time since last
+	 * attempt > 3 months
+	 * <li>else find the two intervals between which the dur falls<br>
+	 * example: 2d falls between 1d and 3d<br>
+	 * if time since last attempt is greater than longer interval, add to candList
+	 * <li>select random word from candList
+	 * </ol>
+	 * 
+	 * @param newOldCount
+	 * @return selected word
+	 */
 	public Word getNextWord(int newOldCount) {
 		oldCount = newOldCount;
 		stats = new int[interval.length];
@@ -398,7 +407,10 @@ public class Manager {
 				for (int i = 1; i < hist.attemptList.size(); ++i) {
 					Attempt cur = hist.attemptList.get(i);
 					if (cur.correct) {
-						long curDur = cur.date.getTime() - prev.date.getTime();
+						long curDur = calcDurationDays(cur.date, prev.date);
+						if (curDur == 0) {
+							curDur = cur.date.getTime() - prev.date.getTime();
+						}
 						if (curDur > dur) {
 							dur = curDur;
 						}
@@ -412,13 +424,13 @@ public class Manager {
 			}
 
 			if (dur > 0) {
-				if (dur > interval[0]) {
+				if (dur >= interval[0]) {
 					++stats[0];
-					if (now.getTime() - hist.attemptList.get(0).date.getTime() > YEAR + 12 * HOUR) {
+					Date firstAttemptDate = hist.attemptList.get(0).date;
+					if (now.getTime() - firstAttemptDate.getTime() > YEAR) {
 						candList.add(hist.word);
 					}
-					else if (now.getTime() - hist.attemptList.get(hist.attemptList.size() - 1).date.getTime() > DAY
-							* 90 + 12 * HOUR) {
+					else if (now.getTime() - lastDate.getTime() > DAY * 90) {
 						candList.add(hist.word);
 					}
 					else {
@@ -427,9 +439,16 @@ public class Manager {
 				}
 				else {
 					for (int i = 1; i < interval.length; ++i) {
-						if (dur > interval[i]) {
-							if (lastDate.getTime() + interval[i - 1] < now.getTime()) {
-								candList.add(hist.word);
+						if (dur >= interval[i]) {
+							if (interval[i] >= HOUR) {
+								if (calcDurationDays(now, lastDate) >= interval[i - 1]) {
+									candList.add(hist.word);
+								}
+							}
+							else {
+								if (now.getTime() - lastDate.getTime() >= interval[i - 1]) {
+									candList.add(hist.word);
+								}
 							}
 							++stats[i];
 							break;
@@ -710,6 +729,23 @@ public class Manager {
 				new RuntimeException(e);
 			}
 		}
+	}
+
+	private Date clearDate(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH);
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		cal.clear();
+		cal.set(year, month, day);
+		return cal.getTime();
+	}
+
+	private long calcDurationDays(Date to, Date from) {
+		long durDays = clearDate(to).getTime() - clearDate(from).getTime();
+		durDays = Math.round(((double) durDays) / DAY) * DAY;
+		return durDays;
 	}
 
 }
