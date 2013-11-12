@@ -305,10 +305,10 @@ public class Manager {
 
 			boolean graduated = false;
 			if (attempt.correct) {
-				Date yearAgo = new Date(System.currentTimeMillis() - YEAR);
+				Date now = new Date();
 				WordHistory wordHist = historyMap.get(attempt.wordTitle);
 				for (Attempt prevAttempt : wordHist.attemptList) {
-					if (prevAttempt.correct && prevAttempt.date.before(yearAgo)) {
+					if (prevAttempt.correct && calcDurationDays(now, prevAttempt.date) > YEAR) {
 						graduated = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
 								"Graduated", JOptionPane.YES_NO_OPTION);
 						break;
