@@ -427,10 +427,10 @@ public class Manager {
 				if (dur >= interval[0]) {
 					++stats[0];
 					Date firstAttemptDate = hist.attemptList.get(0).date;
-					if (now.getTime() - firstAttemptDate.getTime() > YEAR) {
+					if (calcDurationDays(now, firstAttemptDate) > YEAR) {
 						candList.add(hist.word);
 					}
-					else if (now.getTime() - lastDate.getTime() > DAY * 90) {
+					else if (calcDurationDays(now, lastDate) > DAY * 90) {
 						candList.add(hist.word);
 					}
 					else {
