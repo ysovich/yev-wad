@@ -239,16 +239,14 @@ public class FrameMain extends JFrame {
 		Attempt attempt = new Attempt();
 		attempt.wordTitle = word.title;
 		attempt.date = new Date();
-		attempt.correct = Boolean.TRUE;
-		manager.addAttempt(attempt);
+		manager.addAttempt(attempt, true);
 	}
 
 	private void onNo(ActionEvent e) {
 		Attempt attempt = new Attempt();
 		attempt.wordTitle = word.title;
 		attempt.date = new Date();
-		attempt.correct = Boolean.FALSE;
-		manager.addAttempt(attempt);
+		manager.addAttempt(attempt, false);
 	}
 
 	private void onClear(ActionEvent e) {
