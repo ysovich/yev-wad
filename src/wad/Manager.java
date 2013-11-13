@@ -330,7 +330,7 @@ public class Manager {
 			if (graduated) {
 				removeWord(attempt.wordTitle);
 			}
-			else {
+			else if (attempt.correct) {
 				Element attemptEl = xmlDoc.createElement("attempt");
 				docEl.appendChild(attemptEl);
 				attemptEl.setAttribute("wordTitle", attempt.wordTitle);
