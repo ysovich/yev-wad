@@ -115,7 +115,6 @@ public class Manager {
 				Attempt attempt = new Attempt();
 				attempt.wordTitle = attemptEl.getAttribute("wordTitle");
 				attempt.date = dateFormat.parse(attemptEl.getAttribute("date"));
-				attempt.correct = Boolean.parseBoolean(attemptEl.getAttribute("correct"));
 
 				WordHistory wordHistory = historyMap.get(attempt.wordTitle);
 				wordHistory.attemptList.add(attempt);
@@ -289,7 +288,7 @@ public class Manager {
 		}
 	}
 
-	public void addAttempt(Attempt attempt) {
+	public void addAttempt(Attempt attempt, boolean isCorrect) {
 		FileInputStream istr = null;
 		FileOutputStream ostr = null;
 		try {
@@ -304,11 +303,11 @@ public class Manager {
 			Element docEl = xmlDoc.getDocumentElement();
 
 			boolean graduated = false;
-			if (attempt.correct) {
+			if (isCorrect) {
 				Date now = new Date();
 				WordHistory wordHist = historyMap.get(attempt.wordTitle);
 				for (Attempt prevAttempt : wordHist.attemptList) {
-					if (prevAttempt.correct && calcDurationDays(now, prevAttempt.date) > YEAR) {
+					if (calcDurationDays(now, prevAttempt.date) > YEAR) {
 						graduated = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
 								"Graduated", JOptionPane.YES_NO_OPTION);
 						break;
@@ -316,7 +315,7 @@ public class Manager {
 				}
 			}
 
-			if (!attempt.correct || graduated) {
+			if (!isCorrect || graduated) {
 				NodeList nodeList = docEl.getChildNodes();
 				for (int i = 0; i < nodeList.getLength(); ++i) {
 					Node node = nodeList.item(i);
@@ -330,12 +329,11 @@ public class Manager {
 			if (graduated) {
 				removeWord(attempt.wordTitle);
 			}
-			else if (attempt.correct) {
+			else if (isCorrect) {
 				Element attemptEl = xmlDoc.createElement("attempt");
 				docEl.appendChild(attemptEl);
 				attemptEl.setAttribute("wordTitle", attempt.wordTitle);
 				attemptEl.setAttribute("date", dateFormat.format(attempt.date));
-				attemptEl.setAttribute("correct", attempt.correct.toString());
 			}
 
 			ostr = new FileOutputStream(ATTEMPTS_PATH);
@@ -406,17 +404,12 @@ public class Manager {
 				Attempt prev = hist.attemptList.get(0);
 				for (int i = 1; i < hist.attemptList.size(); ++i) {
 					Attempt cur = hist.attemptList.get(i);
-					if (cur.correct) {
-						long curDur = calcDurationDays(cur.date, prev.date);
-						if (curDur == 0) {
-							curDur = cur.date.getTime() - prev.date.getTime();
-						}
-						if (curDur > dur) {
-							dur = curDur;
-						}
+					long curDur = calcDurationDays(cur.date, prev.date);
+					if (curDur == 0) {
+						curDur = cur.date.getTime() - prev.date.getTime();
 					}
-					else {
-						dur = 0;
+					if (curDur > dur) {
+						dur = curDur;
 					}
 					lastDate = cur.date;
 					prev = cur;
