@@ -4,4 +4,5 @@ public class Word {
 	public String title;
 	public String definition;
 	public String example;
+	public boolean isNew;
 }

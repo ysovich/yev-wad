@@ -36,6 +36,8 @@ public class FrameMain extends JFrame {
 	private final JButton jButtonClear = new JButton("Clear");
 	private final JTextField jTextOld = new JTextField("0");
 	private final JLabel jLabelOld = new JLabel();
+	private final JTextField jTextNew = new JTextField("0");
+	private final JLabel jLabelNew = new JLabel();
 	private final JButton jButtonMine = new JButton("Mine");
 	private final JTextArea jTextMine = new JTextArea();
 	private final JButton jButtonUpdate = new JButton("Update");
@@ -89,7 +91,7 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jRadioYes.setText("Yes");
-		jRadioYes.setBounds(new Rectangle(345, 30, 50, 15));
+		jRadioYes.setBounds(new Rectangle(340, 30, 50, 15));
 		jRadioYes.setEnabled(false);
 		jRadioYes.addActionListener(new ActionListener() {
 			@Override
@@ -98,7 +100,7 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jRadioNo.setText("No");
-		jRadioNo.setBounds(new Rectangle(395, 30, 40, 15));
+		jRadioNo.setBounds(new Rectangle(385, 30, 40, 15));
 		jRadioNo.setEnabled(false);
 		jRadioNo.addActionListener(new ActionListener() {
 			@Override
@@ -117,7 +119,7 @@ public class FrameMain extends JFrame {
 		jTextResp.setBounds(new Rectangle(25, 25, 200, 25));
 		jTextResp.setFont(new Font("Tahoma", 0, 16));
 		jLabelStats.setText("");
-		jLabelStats.setBounds(new Rectangle(25, 560, 500, 10));
+		jLabelStats.setBounds(new Rectangle(25, 555, 500, 15));
 		jButtonClear.setText("Clear");
 		jButtonClear.setBounds(new Rectangle(345, 75, 80, 25));
 		jButtonClear.addActionListener(new ActionListener() {
@@ -127,9 +129,13 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jTextOld.setText("0");
-		jTextOld.setBounds(new Rectangle(460, 25, 25, 25));
+		jTextOld.setBounds(new Rectangle(435, 25, 25, 25));
 		jLabelOld.setText("Old");
-		jLabelOld.setBounds(new Rectangle(490, 25, 25, 25));
+		jLabelOld.setBounds(new Rectangle(460, 25, 25, 25));
+		jTextNew.setText("0");
+		jTextNew.setBounds(new Rectangle(485, 25, 25, 25));
+		jLabelNew.setText("New");
+		jLabelNew.setBounds(new Rectangle(510, 25, 25, 25));
 		jButtonMine.setText("Mine");
 		jButtonMine.setBounds(new Rectangle(545, 75, 80, 25));
 		jButtonMine.addActionListener(new ActionListener() {
@@ -150,6 +156,8 @@ public class FrameMain extends JFrame {
 			}
 		});
 
+		this.getContentPane().add(jLabelNew, null);
+		this.getContentPane().add(jTextNew, null);
 		this.getContentPane().add(jLabelOld, null);
 		this.getContentPane().add(jTextOld, null);
 		this.getContentPane().add(jButtonClear, null);
@@ -191,8 +199,16 @@ public class FrameMain extends JFrame {
 		catch (NumberFormatException ex) {
 			oldCount = 0;
 		}
-		word = manager.getNextWord(oldCount);
+		int newCount = 0;
+		try {
+			newCount = Integer.parseInt(jTextNew.getText());
+		}
+		catch (NumberFormatException ex) {
+			newCount = 0;
+		}
+		word = manager.getNextWord(oldCount, newCount);
 		jTextOld.setText(Integer.toString(manager.getOldCount()));
+		jTextNew.setText(Integer.toString(manager.getNewCount()));
 		jTextTitle.setText("");
 		jTextResp.setText("");
 		jTextDef.setText(word == null ? "" : word.definition);
@@ -224,6 +240,9 @@ public class FrameMain extends JFrame {
 			statsStr.append(" ");
 		}
 		statsStr.append(total);
+		statsStr.append("(");
+		statsStr.append(manager.getRemainingNewCount());
+		statsStr.append(")");
 		jLabelStats.setText(statsStr.toString());
 	}
 
@@ -232,6 +251,7 @@ public class FrameMain extends JFrame {
 		newWord.title = jTextTitle.getText();
 		newWord.definition = jTextDef.getText();
 		newWord.example = jTextExample.getText();
+		newWord.isNew = true;
 		manager.addWord(newWord);
 	}
 
