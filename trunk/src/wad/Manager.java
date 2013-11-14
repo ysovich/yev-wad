@@ -56,6 +56,7 @@ public class Manager {
 	private Map<String, WordHistory> historyMap;
 	private int stats[];
 	private int oldCount;
+	private int newCount;
 
 	public Manager(String configPath) {
 		Properties prop = new Properties();
@@ -70,6 +71,18 @@ public class Manager {
 			throw new RuntimeException(e);
 		}
 		load();
+	}
+
+	public int[] getStats() {
+		return stats;
+	}
+
+	public int getOldCount() {
+		return oldCount;
+	}
+
+	public int getNewCount() {
+		return newCount;
 	}
 
 	public void load() {
@@ -93,6 +106,7 @@ public class Manager {
 				Element wordEl = (Element) nodeList.item(i);
 				Word word = new Word();
 				word.title = wordEl.getAttribute("title");
+				word.isNew = Boolean.TRUE.toString().equals(wordEl.getAttribute("new"));
 				Element defEl = (Element) xpath.evaluate("./definition", wordEl, XPathConstants.NODE);
 				word.definition = defEl.getTextContent();
 				Element exampleEl = (Element) xpath.evaluate("./example", wordEl, XPathConstants.NODE);
@@ -171,6 +185,7 @@ public class Manager {
 			Element wordEl = xmlDoc.createElement("word");
 			docEl.appendChild(wordEl);
 			wordEl.setAttribute("title", word.title);
+			wordEl.setAttribute("new", Boolean.toString(word.isNew));
 			Element defEl = xmlDoc.createElement("definition");
 			wordEl.appendChild(defEl);
 			defEl.setTextContent(word.definition);
@@ -390,13 +405,17 @@ public class Manager {
 	 * @param newOldCount
 	 * @return selected word
 	 */
-	public Word getNextWord(int newOldCount) {
+	public Word getNextWord(int newOldCount, int newNewCount) {
 		oldCount = newOldCount;
+		newCount = updateNewWords(newNewCount);
 		stats = new int[interval.length];
 		List<Word> candList = new ArrayList<Word>();
 		List<Word> doneList = new ArrayList<Word>();
 		for (Map.Entry<String, WordHistory> entry : historyMap.entrySet()) {
 			WordHistory hist = entry.getValue();
+			if (hist.word.isNew) {
+				continue;
+			}
 			long dur = 0;
 			Date now = new Date();
 			Date lastDate = now;
@@ -527,18 +546,6 @@ public class Manager {
 		}
 	}
 
-	public int[] getStats() {
-		return stats;
-	}
-
-	public void setOldCount(int oldCount) {
-		this.oldCount = oldCount;
-	}
-
-	public int getOldCount() {
-		return oldCount;
-	}
-
 	public String mine() {
 		StringBuilder selectedWords = new StringBuilder();
 		try {
@@ -591,7 +598,7 @@ public class Manager {
 		return selectedWords.toString();
 	}
 
-	void updateTitle(String wordTitle, String newTitle) {
+	public void updateTitle(String wordTitle, String newTitle) {
 		FileInputStream istr = null;
 		FileOutputStream ostr = null;
 		try {
@@ -664,7 +671,18 @@ public class Manager {
 		}
 	}
 
-	public void updateAllAttempts(String wordTitle, String newTitle) {
+	public int getRemainingNewCount() {
+		int retCount = 0;
+		for (Map.Entry<String, WordHistory> entry : historyMap.entrySet()) {
+			WordHistory hist = entry.getValue();
+			if (hist.word.isNew) {
+				++retCount;
+			}
+		}
+		return retCount;
+	}
+
+	private void updateAllAttempts(String wordTitle, String newTitle) {
 		FileInputStream istr = null;
 		FileOutputStream ostr = null;
 		try {
@@ -739,6 +757,79 @@ public class Manager {
 		long durDays = clearDate(to).getTime() - clearDate(from).getTime();
 		durDays = Math.round(((double) durDays) / DAY) * DAY;
 		return durDays;
+	}
+
+	private int updateNewWords(int newWordCount) {
+		if (newWordCount <= 0) {
+			return 0;
+		}
+		int retWordCount = newWordCount;
+		FileInputStream istr = null;
+		FileOutputStream ostr = null;
+		try {
+			istr = new FileInputStream(WORDS_PATH);
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			docFactory.setNamespaceAware(true);
+			DocumentBuilder builder = docFactory.newDocumentBuilder();
+			Document xmlDoc = builder.parse(new InputSource(istr));
+			istr.close();
+			istr = null;
+
+			XPathFactory factory = XPathFactory.newInstance();
+			XPath xpath = factory.newXPath();
+
+			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
+			if (nodeList != null) {
+				for (int i = 0; i < nodeList.getLength() && retWordCount > 0; ++i) {
+					Element el = (Element) nodeList.item(i);
+					if (Boolean.TRUE.toString().equals(el.getAttribute("new"))) {
+						el.removeAttribute("new");
+						--retWordCount;
+					}
+				}
+			}
+
+			if (newWordCount > 0 && newWordCount != retWordCount) {
+				ostr = new FileOutputStream(WORDS_PATH);
+				DOMSource domSrc = new DOMSource(xmlDoc);
+				TransformerFactory tFactory = TransformerFactory.newInstance();
+				Transformer transformer = tFactory.newTransformer();
+				transformer.transform(domSrc, new StreamResult(ostr));
+				ostr.close();
+				ostr = null;
+
+				load();
+			}
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (SAXException e) {
+			throw new RuntimeException(e);
+		}
+		catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+		catch (XPathExpressionException e) {
+			throw new RuntimeException(e);
+		}
+		catch (TransformerException e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if (istr != null) {
+					istr.close();
+				}
+				if (istr != null) {
+					ostr.close();
+				}
+			}
+			catch (IOException e) {
+				new RuntimeException(e);
+			}
+		}
+		return retWordCount;
 	}
 
 }
