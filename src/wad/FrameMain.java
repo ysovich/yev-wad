@@ -91,7 +91,7 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jRadioYes.setText("Yes");
-		jRadioYes.setBounds(new Rectangle(340, 30, 50, 15));
+		jRadioYes.setBounds(new Rectangle(335, 30, 50, 15));
 		jRadioYes.setEnabled(false);
 		jRadioYes.addActionListener(new ActionListener() {
 			@Override
