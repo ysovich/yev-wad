@@ -332,7 +332,7 @@ public class Manager {
 
 			if (!isCorrect || graduated) {
 				NodeList nodeList = docEl.getChildNodes();
-				for (int i = 0; i < nodeList.getLength(); ++i) {
+				for (int i = nodeList.getLength() - 1; i >= 0 ; --i) {
 					Node node = nodeList.item(i);
 					if (node.getNodeType() == Node.ELEMENT_NODE) {
 						if (attempt.wordTitle.equals(((Element) node).getAttribute("wordTitle"))) {
