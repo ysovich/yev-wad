@@ -23,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -131,6 +132,9 @@ public class Manager {
 				attempt.date = dateFormat.parse(attemptEl.getAttribute("date"));
 
 				WordHistory wordHistory = historyMap.get(attempt.wordTitle);
+				if (wordHistory == null) {
+					throw new RuntimeException(attempt.wordTitle);
+				}
 				wordHistory.attemptList.add(attempt);
 			}
 		}
@@ -171,7 +175,6 @@ public class Manager {
 			return;
 		}
 		FileInputStream istr = null;
-		FileOutputStream ostr = null;
 		try {
 			istr = new FileInputStream(WORDS_PATH);
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -193,14 +196,7 @@ public class Manager {
 			wordEl.appendChild(exampleEl);
 			exampleEl.setTextContent(word.example);
 
-			ostr = new FileOutputStream(WORDS_PATH);
-			DOMSource domSrc = new DOMSource(xmlDoc);
-			TransformerFactory tFactory = TransformerFactory.newInstance();
-			Transformer transformer = tFactory.newTransformer();
-			transformer.transform(domSrc, new StreamResult(ostr));
-			ostr.close();
-			ostr = null;
-
+			saveXml(xmlDoc, WORDS_PATH);
 			load();
 		}
 		catch (IOException e) {
@@ -212,16 +208,10 @@ public class Manager {
 		catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
-		catch (TransformerException e) {
-			throw new RuntimeException(e);
-		}
 		finally {
 			try {
 				if (istr != null) {
 					istr.close();
-				}
-				if (istr != null) {
-					ostr.close();
 				}
 			}
 			catch (IOException e) {
@@ -232,7 +222,6 @@ public class Manager {
 
 	public void removeWord(String wordTitle) {
 		FileInputStream istr = null;
-		FileOutputStream ostr = null;
 		try {
 			istr = new FileInputStream(WORDS_PATH);
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -259,17 +248,8 @@ public class Manager {
 
 			if (wordEl != null) {
 				wordEl.getParentNode().removeChild(wordEl);
-
-				ostr = new FileOutputStream(WORDS_PATH);
-				DOMSource domSrc = new DOMSource(xmlDoc);
-				TransformerFactory tFactory = TransformerFactory.newInstance();
-				Transformer transformer = tFactory.newTransformer();
-				transformer.transform(domSrc, new StreamResult(ostr));
-				ostr.close();
-				ostr = null;
-
+				saveXml(xmlDoc, WORDS_PATH);
 				removeAllAttempts(wordTitle);
-
 				load();
 			}
 		}
@@ -285,16 +265,10 @@ public class Manager {
 		catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
 		}
-		catch (TransformerException e) {
-			throw new RuntimeException(e);
-		}
 		finally {
 			try {
 				if (istr != null) {
 					istr.close();
-				}
-				if (istr != null) {
-					ostr.close();
 				}
 			}
 			catch (IOException e) {
@@ -305,7 +279,6 @@ public class Manager {
 
 	public void addAttempt(Attempt attempt, boolean isCorrect) {
 		FileInputStream istr = null;
-		FileOutputStream ostr = null;
 		try {
 			istr = new FileInputStream(ATTEMPTS_PATH);
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -323,8 +296,9 @@ public class Manager {
 				WordHistory wordHist = historyMap.get(attempt.wordTitle);
 				for (Attempt prevAttempt : wordHist.attemptList) {
 					if (calcDurationDays(now, prevAttempt.date) > YEAR) {
-						graduated = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
-								"Graduated", JOptionPane.YES_NO_OPTION);
+						graduated =
+								JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
+										"Graduated", JOptionPane.YES_NO_OPTION);
 						break;
 					}
 				}
@@ -332,7 +306,7 @@ public class Manager {
 
 			if (!isCorrect || graduated) {
 				NodeList nodeList = docEl.getChildNodes();
-				for (int i = nodeList.getLength() - 1; i >= 0 ; --i) {
+				for (int i = nodeList.getLength() - 1; i >= 0; --i) {
 					Node node = nodeList.item(i);
 					if (node.getNodeType() == Node.ELEMENT_NODE) {
 						if (attempt.wordTitle.equals(((Element) node).getAttribute("wordTitle"))) {
@@ -351,14 +325,7 @@ public class Manager {
 				attemptEl.setAttribute("date", dateFormat.format(attempt.date));
 			}
 
-			ostr = new FileOutputStream(ATTEMPTS_PATH);
-			DOMSource domSrc = new DOMSource(xmlDoc);
-			TransformerFactory tFactory = TransformerFactory.newInstance();
-			Transformer transformer = tFactory.newTransformer();
-			transformer.transform(domSrc, new StreamResult(ostr));
-			ostr.close();
-			ostr = null;
-
+			saveXml(xmlDoc, ATTEMPTS_PATH);
 			load();
 		}
 		catch (IOException e) {
@@ -370,16 +337,10 @@ public class Manager {
 		catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
-		catch (TransformerException e) {
-			throw new RuntimeException(e);
-		}
 		finally {
 			try {
 				if (istr != null) {
 					istr.close();
-				}
-				if (istr != null) {
-					ostr.close();
 				}
 			}
 			catch (IOException e) {
@@ -489,7 +450,6 @@ public class Manager {
 
 	public void removeAllAttempts(String wordTitle) {
 		FileInputStream istr = null;
-		FileOutputStream ostr = null;
 		try {
 			istr = new FileInputStream(ATTEMPTS_PATH);
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -511,13 +471,7 @@ public class Manager {
 				}
 			}
 
-			ostr = new FileOutputStream(ATTEMPTS_PATH);
-			DOMSource domSrc = new DOMSource(xmlDoc);
-			TransformerFactory tFactory = TransformerFactory.newInstance();
-			Transformer transformer = tFactory.newTransformer();
-			transformer.transform(domSrc, new StreamResult(ostr));
-			ostr.close();
-			ostr = null;
+			saveXml(xmlDoc, ATTEMPTS_PATH);
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
@@ -528,16 +482,10 @@ public class Manager {
 		catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
-		catch (TransformerException e) {
-			throw new RuntimeException(e);
-		}
 		finally {
 			try {
 				if (istr != null) {
 					istr.close();
-				}
-				if (istr != null) {
-					ostr.close();
 				}
 			}
 			catch (IOException e) {
@@ -600,7 +548,6 @@ public class Manager {
 
 	public void updateTitle(String wordTitle, String newTitle) {
 		FileInputStream istr = null;
-		FileOutputStream ostr = null;
 		try {
 			istr = new FileInputStream(WORDS_PATH);
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -627,17 +574,8 @@ public class Manager {
 
 			if (wordEl != null) {
 				wordEl.setAttribute("title", newTitle);
-
-				ostr = new FileOutputStream(WORDS_PATH);
-				DOMSource domSrc = new DOMSource(xmlDoc);
-				TransformerFactory tFactory = TransformerFactory.newInstance();
-				Transformer transformer = tFactory.newTransformer();
-				transformer.transform(domSrc, new StreamResult(ostr));
-				ostr.close();
-				ostr = null;
-
+				saveXml(xmlDoc, WORDS_PATH);
 				updateAllAttempts(wordTitle, newTitle);
-
 				load();
 			}
 		}
@@ -653,16 +591,10 @@ public class Manager {
 		catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
 		}
-		catch (TransformerException e) {
-			throw new RuntimeException(e);
-		}
 		finally {
 			try {
 				if (istr != null) {
 					istr.close();
-				}
-				if (istr != null) {
-					ostr.close();
 				}
 			}
 			catch (IOException e) {
@@ -684,7 +616,6 @@ public class Manager {
 
 	private void updateAllAttempts(String wordTitle, String newTitle) {
 		FileInputStream istr = null;
-		FileOutputStream ostr = null;
 		try {
 			istr = new FileInputStream(ATTEMPTS_PATH);
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -707,13 +638,7 @@ public class Manager {
 				}
 			}
 
-			ostr = new FileOutputStream(ATTEMPTS_PATH);
-			DOMSource domSrc = new DOMSource(xmlDoc);
-			TransformerFactory tFactory = TransformerFactory.newInstance();
-			Transformer transformer = tFactory.newTransformer();
-			transformer.transform(domSrc, new StreamResult(ostr));
-			ostr.close();
-			ostr = null;
+			saveXml(xmlDoc, ATTEMPTS_PATH);
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
@@ -724,16 +649,10 @@ public class Manager {
 		catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
-		catch (TransformerException e) {
-			throw new RuntimeException(e);
-		}
 		finally {
 			try {
 				if (istr != null) {
 					istr.close();
-				}
-				if (istr != null) {
-					ostr.close();
 				}
 			}
 			catch (IOException e) {
@@ -765,7 +684,6 @@ public class Manager {
 		}
 		int retWordCount = newWordCount;
 		FileInputStream istr = null;
-		FileOutputStream ostr = null;
 		try {
 			istr = new FileInputStream(WORDS_PATH);
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -790,14 +708,7 @@ public class Manager {
 			}
 
 			if (newWordCount > 0 && newWordCount != retWordCount) {
-				ostr = new FileOutputStream(WORDS_PATH);
-				DOMSource domSrc = new DOMSource(xmlDoc);
-				TransformerFactory tFactory = TransformerFactory.newInstance();
-				Transformer transformer = tFactory.newTransformer();
-				transformer.transform(domSrc, new StreamResult(ostr));
-				ostr.close();
-				ostr = null;
-
+				saveXml(xmlDoc, WORDS_PATH);
 				load();
 			}
 		}
@@ -813,16 +724,10 @@ public class Manager {
 		catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
 		}
-		catch (TransformerException e) {
-			throw new RuntimeException(e);
-		}
 		finally {
 			try {
 				if (istr != null) {
 					istr.close();
-				}
-				if (istr != null) {
-					ostr.close();
 				}
 			}
 			catch (IOException e) {
@@ -830,6 +735,34 @@ public class Manager {
 			}
 		}
 		return retWordCount;
+	}
+
+	private void saveXml(Document xmlDoc, String path) {
+		FileOutputStream ostr = null;
+		try {
+			ostr = new FileOutputStream(path);
+			DOMSource domSrc = new DOMSource(xmlDoc);
+			TransformerFactory tFactory = TransformerFactory.newInstance();
+			Transformer transformer = tFactory.newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			transformer.transform(domSrc, new StreamResult(ostr));
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		catch (TransformerException e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if (ostr != null) {
+					ostr.close();
+				}
+			}
+			catch (IOException e) {
+				new RuntimeException(e);
+			}
+		}
 	}
 
 }
