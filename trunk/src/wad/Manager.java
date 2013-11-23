@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -58,8 +59,12 @@ public class Manager {
 	private int stats[];
 	private int oldCount;
 	private int newCount;
+	private LinkedList<String> lastAttempts = new LinkedList<String>();
 
 	public Manager(String configPath) {
+		lastAttempts.push("");
+		lastAttempts.push("");
+		lastAttempts.push("");
 		Properties prop = new Properties();
 		try {
 			prop.load(new FileInputStream(configPath));
@@ -136,6 +141,8 @@ public class Manager {
 					throw new RuntimeException(attempt.wordTitle);
 				}
 				wordHistory.attemptList.add(attempt);
+				lastAttempts.addFirst(attempt.wordTitle);
+				lastAttempts.pollLast();
 			}
 		}
 		catch (IOException e) {
@@ -296,9 +303,9 @@ public class Manager {
 				WordHistory wordHist = historyMap.get(attempt.wordTitle);
 				for (Attempt prevAttempt : wordHist.attemptList) {
 					if (calcDurationDays(now, prevAttempt.date) > YEAR) {
-						graduated =
-								JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null, "Graduated!",
-										"Graduated", JOptionPane.YES_NO_OPTION);
+						int confirm = JOptionPane.showConfirmDialog(null, "Graduated!", "Graduated",
+								JOptionPane.YES_NO_OPTION);
+						graduated = JOptionPane.YES_OPTION == confirm;
 						break;
 					}
 				}
@@ -324,6 +331,8 @@ public class Manager {
 				attemptEl.setAttribute("wordTitle", attempt.wordTitle);
 				attemptEl.setAttribute("date", dateFormat.format(attempt.date));
 			}
+			lastAttempts.addFirst(attempt.wordTitle);
+			lastAttempts.pollLast();
 
 			saveXml(xmlDoc, ATTEMPTS_PATH);
 			load();
@@ -438,6 +447,14 @@ public class Manager {
 		Word selWord = null;
 		Random rnd = new Random();
 		if (!candList.isEmpty()) {
+			for (String lastAttempt : lastAttempts) {
+				if (candList.size() > 1) {
+					WordHistory wordHist = historyMap.get(lastAttempt);
+					if (wordHist != null) {
+						candList.remove(wordHist.word);
+					}
+				}
+			}
 			selWord = candList.get(rnd.nextInt(candList.size()));
 		}
 		if (oldCount > 0 && selWord == null && !doneList.isEmpty()) {
