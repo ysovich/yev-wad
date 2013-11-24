@@ -141,8 +141,6 @@ public class Manager {
 					throw new RuntimeException(attempt.wordTitle);
 				}
 				wordHistory.attemptList.add(attempt);
-				lastAttempts.addFirst(attempt.wordTitle);
-				lastAttempts.pollLast();
 			}
 		}
 		catch (IOException e) {
