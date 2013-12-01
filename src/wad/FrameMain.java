@@ -243,6 +243,8 @@ public class FrameMain extends JFrame {
 		statsStr.append("(");
 		statsStr.append(manager.getRemainingNewCount());
 		statsStr.append(")");
+		statsStr.append(" C:");
+		statsStr.append(manager.getCandCount());
 		jLabelStats.setText(statsStr.toString());
 	}
 

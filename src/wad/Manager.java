@@ -60,6 +60,7 @@ public class Manager {
 	private int oldCount;
 	private int newCount;
 	private LinkedList<String> lastAttempts = new LinkedList<String>();
+	private int candCount;
 
 	public Manager(String configPath) {
 		lastAttempts.push("");
@@ -89,6 +90,10 @@ public class Manager {
 
 	public int getNewCount() {
 		return newCount;
+	}
+
+	public int getCandCount() {
+		return candCount;
 	}
 
 	public void load() {
@@ -441,6 +446,8 @@ public class Manager {
 				++stats[stats.length - 1];
 			}
 		}
+
+		candCount = candList.size();
 
 		Word selWord = null;
 		Random rnd = new Random();
