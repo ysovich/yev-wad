@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="create_run_jar" name="WAD">
+	<tstamp>
+		<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
+	</tstamp>
 	<target name="create_run_jar">
 		<jar destfile="deploy/wad.jar" filesetmanifest="mergewithoutmain">
 			<manifest>
 				<attribute name="Main-Class" value="wad.Wad" />
 				<attribute name="Class-Path" value="." />
+				<attribute name="Built-Date" value="${TODAY}" />
 			</manifest>
-			<fileset dir="classes" excludes="**/*.properties"/>
+			<fileset dir="classes" excludes="**/*.properties" />
 			<fileset dir="src" />
 			<fileset file="build.xml" />
 		</jar>
