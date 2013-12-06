@@ -44,6 +44,7 @@ import org.xml.sax.SAXException;
 
 public class Manager {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	private static final XPath xpath = XPathFactory.newInstance().newXPath();
 	private static final long MINUTE = 1000 * 60;
 	private static final long HOUR = 60 * MINUTE;
 	private static final long DAY = 24 * HOUR;
@@ -97,19 +98,8 @@ public class Manager {
 	}
 
 	public void load() {
-		FileInputStream istr = null;
 		try {
-			istr = new FileInputStream(WORDS_PATH);
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			docFactory.setNamespaceAware(true);
-			DocumentBuilder builder = docFactory.newDocumentBuilder();
-			Document xmlDoc = builder.parse(new InputSource(istr));
-			istr.close();
-			istr = null;
-
-			XPathFactory factory = XPathFactory.newInstance();
-			XPath xpath = factory.newXPath();
-
+			Document xmlDoc = loadXml(WORDS_PATH);
 			historyMap = new HashMap<String, WordHistory>();
 			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
 			int len = nodeList.getLength();
@@ -129,10 +119,7 @@ public class Manager {
 				historyMap.put(word.title, wordHistory);
 			}
 
-			istr = new FileInputStream(ATTEMPTS_PATH);
-			xmlDoc = builder.parse(new InputSource(istr));
-			istr.close();
-			istr = null;
+			xmlDoc = loadXml(ATTEMPTS_PATH);
 			nodeList = (NodeList) xpath.evaluate("/attempts/attempt", xmlDoc, XPathConstants.NODESET);
 			len = nodeList.getLength();
 			for (int i = 0; i < len; ++i) {
@@ -148,30 +135,11 @@ public class Manager {
 				wordHistory.attemptList.add(attempt);
 			}
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
 		catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
-		catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
 		catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
-		}
-		finally {
-			if (istr != null) {
-				try {
-					istr.close();
-				}
-				catch (IOException e) {
-					new RuntimeException(e);
-				}
-			}
 		}
 	}
 
@@ -184,66 +152,25 @@ public class Manager {
 			JOptionPane.showMessageDialog(null, "Title already exist");
 			return;
 		}
-		FileInputStream istr = null;
-		try {
-			istr = new FileInputStream(WORDS_PATH);
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			docFactory.setNamespaceAware(true);
-			DocumentBuilder builder = docFactory.newDocumentBuilder();
-			Document xmlDoc = builder.parse(new InputSource(istr));
-			istr.close();
-			istr = null;
-
-			Element docEl = xmlDoc.getDocumentElement();
-			Element wordEl = xmlDoc.createElement("word");
-			docEl.appendChild(wordEl);
-			wordEl.setAttribute("title", word.title);
-			wordEl.setAttribute("new", Boolean.toString(word.isNew));
-			Element defEl = xmlDoc.createElement("definition");
-			wordEl.appendChild(defEl);
-			defEl.setTextContent(word.definition);
-			Element exampleEl = xmlDoc.createElement("example");
-			wordEl.appendChild(exampleEl);
-			exampleEl.setTextContent(word.example);
-
-			saveXml(xmlDoc, WORDS_PATH);
-			load();
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
-		catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				if (istr != null) {
-					istr.close();
-				}
-			}
-			catch (IOException e) {
-				new RuntimeException(e);
-			}
-		}
+		Document xmlDoc = loadXml(WORDS_PATH);
+		Element docEl = xmlDoc.getDocumentElement();
+		Element wordEl = xmlDoc.createElement("word");
+		docEl.appendChild(wordEl);
+		wordEl.setAttribute("title", word.title);
+		wordEl.setAttribute("new", Boolean.toString(word.isNew));
+		Element defEl = xmlDoc.createElement("definition");
+		wordEl.appendChild(defEl);
+		defEl.setTextContent(word.definition);
+		Element exampleEl = xmlDoc.createElement("example");
+		wordEl.appendChild(exampleEl);
+		exampleEl.setTextContent(word.example);
+		saveXml(xmlDoc, WORDS_PATH);
+		load();
 	}
 
 	public void removeWord(String wordTitle) {
-		FileInputStream istr = null;
 		try {
-			istr = new FileInputStream(WORDS_PATH);
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			docFactory.setNamespaceAware(true);
-			DocumentBuilder builder = docFactory.newDocumentBuilder();
-			Document xmlDoc = builder.parse(new InputSource(istr));
-			istr.close();
-			istr = null;
-
-			XPathFactory factory = XPathFactory.newInstance();
-			XPath xpath = factory.newXPath();
-
+			Document xmlDoc = loadXml(WORDS_PATH);
 			Element wordEl = null;
 			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
 			if (nodeList != null) {
@@ -263,102 +190,54 @@ public class Manager {
 				load();
 			}
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
-		catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
 		catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				if (istr != null) {
-					istr.close();
-				}
-			}
-			catch (IOException e) {
-				new RuntimeException(e);
-			}
 		}
 	}
 
 	public void addAttempt(Attempt attempt, boolean isCorrect) {
-		FileInputStream istr = null;
-		try {
-			istr = new FileInputStream(ATTEMPTS_PATH);
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			docFactory.setNamespaceAware(true);
-			DocumentBuilder builder = docFactory.newDocumentBuilder();
-			Document xmlDoc = builder.parse(new InputSource(istr));
-			istr.close();
-			istr = null;
+		Document xmlDoc = loadXml(ATTEMPTS_PATH);
+		Element docEl = xmlDoc.getDocumentElement();
+		boolean graduated = false;
+		if (isCorrect) {
+			Date now = new Date();
+			WordHistory wordHist = historyMap.get(attempt.wordTitle);
+			for (Attempt prevAttempt : wordHist.attemptList) {
+				if (calcDurationDays(now, prevAttempt.date) > YEAR) {
+					int confirm =
+							JOptionPane.showConfirmDialog(null, "Graduated!", "Graduated",
+									JOptionPane.YES_NO_OPTION);
+					graduated = JOptionPane.YES_OPTION == confirm;
+					break;
+				}
+			}
+		}
 
-			Element docEl = xmlDoc.getDocumentElement();
-
-			boolean graduated = false;
-			if (isCorrect) {
-				Date now = new Date();
-				WordHistory wordHist = historyMap.get(attempt.wordTitle);
-				for (Attempt prevAttempt : wordHist.attemptList) {
-					if (calcDurationDays(now, prevAttempt.date) > YEAR) {
-						int confirm = JOptionPane.showConfirmDialog(null, "Graduated!", "Graduated",
-								JOptionPane.YES_NO_OPTION);
-						graduated = JOptionPane.YES_OPTION == confirm;
-						break;
+		if (!isCorrect || graduated) {
+			NodeList nodeList = docEl.getChildNodes();
+			for (int i = nodeList.getLength() - 1; i >= 0; --i) {
+				Node node = nodeList.item(i);
+				if (node.getNodeType() == Node.ELEMENT_NODE) {
+					if (attempt.wordTitle.equals(((Element) node).getAttribute("wordTitle"))) {
+						docEl.removeChild(node);
 					}
 				}
 			}
+		}
+		if (graduated) {
+			removeWord(attempt.wordTitle);
+		}
+		else if (isCorrect) {
+			Element attemptEl = xmlDoc.createElement("attempt");
+			docEl.appendChild(attemptEl);
+			attemptEl.setAttribute("wordTitle", attempt.wordTitle);
+			attemptEl.setAttribute("date", dateFormat.format(attempt.date));
+		}
+		lastAttempts.addFirst(attempt.wordTitle);
+		lastAttempts.pollLast();
 
-			if (!isCorrect || graduated) {
-				NodeList nodeList = docEl.getChildNodes();
-				for (int i = nodeList.getLength() - 1; i >= 0; --i) {
-					Node node = nodeList.item(i);
-					if (node.getNodeType() == Node.ELEMENT_NODE) {
-						if (attempt.wordTitle.equals(((Element) node).getAttribute("wordTitle"))) {
-							docEl.removeChild(node);
-						}
-					}
-				}
-			}
-			if (graduated) {
-				removeWord(attempt.wordTitle);
-			}
-			else if (isCorrect) {
-				Element attemptEl = xmlDoc.createElement("attempt");
-				docEl.appendChild(attemptEl);
-				attemptEl.setAttribute("wordTitle", attempt.wordTitle);
-				attemptEl.setAttribute("date", dateFormat.format(attempt.date));
-			}
-			lastAttempts.addFirst(attempt.wordTitle);
-			lastAttempts.pollLast();
-
-			saveXml(xmlDoc, ATTEMPTS_PATH);
-			load();
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
-		catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				if (istr != null) {
-					istr.close();
-				}
-			}
-			catch (IOException e) {
-				new RuntimeException(e);
-			}
-		}
+		saveXml(xmlDoc, ATTEMPTS_PATH);
+		load();
 	}
 
 	/**
@@ -471,49 +350,18 @@ public class Manager {
 	}
 
 	public void removeAllAttempts(String wordTitle) {
-		FileInputStream istr = null;
-		try {
-			istr = new FileInputStream(ATTEMPTS_PATH);
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			docFactory.setNamespaceAware(true);
-			DocumentBuilder builder = docFactory.newDocumentBuilder();
-			Document xmlDoc = builder.parse(new InputSource(istr));
-			istr.close();
-			istr = null;
-
-			Element docEl = xmlDoc.getDocumentElement();
-
-			NodeList nodeList = docEl.getChildNodes();
-			for (int i = 0; i < nodeList.getLength(); ++i) {
-				Node node = nodeList.item(i);
-				if (node.getNodeType() == Node.ELEMENT_NODE) {
-					if (wordTitle.equals(((Element) node).getAttribute("wordTitle"))) {
-						docEl.removeChild(node);
-					}
+		Document xmlDoc = loadXml(ATTEMPTS_PATH);
+		Element docEl = xmlDoc.getDocumentElement();
+		NodeList nodeList = docEl.getChildNodes();
+		for (int i = 0; i < nodeList.getLength(); ++i) {
+			Node node = nodeList.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				if (wordTitle.equals(((Element) node).getAttribute("wordTitle"))) {
+					docEl.removeChild(node);
 				}
 			}
-
-			saveXml(xmlDoc, ATTEMPTS_PATH);
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
-		catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				if (istr != null) {
-					istr.close();
-				}
-			}
-			catch (IOException e) {
-				new RuntimeException(e);
-			}
-		}
+		saveXml(xmlDoc, ATTEMPTS_PATH);
 	}
 
 	public String mine() {
@@ -569,19 +417,8 @@ public class Manager {
 	}
 
 	public void updateTitle(String wordTitle, String newTitle) {
-		FileInputStream istr = null;
 		try {
-			istr = new FileInputStream(WORDS_PATH);
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			docFactory.setNamespaceAware(true);
-			DocumentBuilder builder = docFactory.newDocumentBuilder();
-			Document xmlDoc = builder.parse(new InputSource(istr));
-			istr.close();
-			istr = null;
-
-			XPathFactory factory = XPathFactory.newInstance();
-			XPath xpath = factory.newXPath();
-
+			Document xmlDoc = loadXml(WORDS_PATH);
 			Element wordEl = null;
 			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
 			if (nodeList != null) {
@@ -601,27 +438,8 @@ public class Manager {
 				load();
 			}
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
-		catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
 		catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				if (istr != null) {
-					istr.close();
-				}
-			}
-			catch (IOException e) {
-				new RuntimeException(e);
-			}
 		}
 	}
 
@@ -637,50 +455,19 @@ public class Manager {
 	}
 
 	private void updateAllAttempts(String wordTitle, String newTitle) {
-		FileInputStream istr = null;
-		try {
-			istr = new FileInputStream(ATTEMPTS_PATH);
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			docFactory.setNamespaceAware(true);
-			DocumentBuilder builder = docFactory.newDocumentBuilder();
-			Document xmlDoc = builder.parse(new InputSource(istr));
-			istr.close();
-			istr = null;
-
-			Element docEl = xmlDoc.getDocumentElement();
-
-			NodeList nodeList = docEl.getChildNodes();
-			for (int i = 0; i < nodeList.getLength(); ++i) {
-				Node node = nodeList.item(i);
-				if (node.getNodeType() == Node.ELEMENT_NODE) {
-					Element element = (Element) node;
-					if (wordTitle.equals(element.getAttribute("wordTitle"))) {
-						element.setAttribute("wordTitle", newTitle);
-					}
+		Document xmlDoc = loadXml(ATTEMPTS_PATH);
+		Element docEl = xmlDoc.getDocumentElement();
+		NodeList nodeList = docEl.getChildNodes();
+		for (int i = 0; i < nodeList.getLength(); ++i) {
+			Node node = nodeList.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element element = (Element) node;
+				if (wordTitle.equals(element.getAttribute("wordTitle"))) {
+					element.setAttribute("wordTitle", newTitle);
 				}
 			}
-
-			saveXml(xmlDoc, ATTEMPTS_PATH);
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
-		catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				if (istr != null) {
-					istr.close();
-				}
-			}
-			catch (IOException e) {
-				new RuntimeException(e);
-			}
-		}
+		saveXml(xmlDoc, ATTEMPTS_PATH);
 	}
 
 	private Date clearDate(Date date) {
@@ -705,19 +492,9 @@ public class Manager {
 			return 0;
 		}
 		int retWordCount = newWordCount;
-		FileInputStream istr = null;
+
 		try {
-			istr = new FileInputStream(WORDS_PATH);
-			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-			docFactory.setNamespaceAware(true);
-			DocumentBuilder builder = docFactory.newDocumentBuilder();
-			Document xmlDoc = builder.parse(new InputSource(istr));
-			istr.close();
-			istr = null;
-
-			XPathFactory factory = XPathFactory.newInstance();
-			XPath xpath = factory.newXPath();
-
+			Document xmlDoc = loadXml(WORDS_PATH);
 			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
 			if (nodeList != null) {
 				for (int i = 0; i < nodeList.getLength() && retWordCount > 0; ++i) {
@@ -734,28 +511,10 @@ public class Manager {
 				load();
 			}
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		catch (SAXException e) {
-			throw new RuntimeException(e);
-		}
-		catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
 		catch (XPathExpressionException e) {
 			throw new RuntimeException(e);
 		}
-		finally {
-			try {
-				if (istr != null) {
-					istr.close();
-				}
-			}
-			catch (IOException e) {
-				new RuntimeException(e);
-			}
-		}
+
 		return retWordCount;
 	}
 
@@ -779,6 +538,37 @@ public class Manager {
 			try {
 				if (ostr != null) {
 					ostr.close();
+				}
+			}
+			catch (IOException e) {
+				new RuntimeException(e);
+			}
+		}
+	}
+
+	private Document loadXml(String path) {
+		FileInputStream istr = null;
+		try {
+			istr = new FileInputStream(path);
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			docFactory.setNamespaceAware(true);
+			DocumentBuilder builder = docFactory.newDocumentBuilder();
+			Document xmlDoc = builder.parse(new InputSource(istr));
+			return xmlDoc;
+		}
+		catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+		catch (SAXException e) {
+			throw new RuntimeException(e);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if (istr != null) {
+					istr.close();
 				}
 			}
 			catch (IOException e) {
