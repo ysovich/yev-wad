@@ -185,9 +185,11 @@ public class FrameMain extends JFrame {
 		String title = word.title.split("\\d")[0];
 		if (jTextResp.getText().equals(title)) {
 			jTextResp.setForeground(new Color(0, 192, 0));
+			jRadioYes.requestFocusInWindow();
 		}
 		else {
 			jTextResp.setForeground(new Color(192, 0, 0));
+			jRadioNo.requestFocusInWindow();
 		}
 	}
 
@@ -246,6 +248,7 @@ public class FrameMain extends JFrame {
 		statsStr.append(" C:");
 		statsStr.append(manager.getCandCount());
 		jLabelStats.setText(statsStr.toString());
+		jTextResp.requestFocusInWindow();
 	}
 
 	private void onSave(ActionEvent e) {
@@ -262,6 +265,7 @@ public class FrameMain extends JFrame {
 		attempt.wordTitle = word.title;
 		attempt.date = new Date();
 		manager.addAttempt(attempt, true);
+		jButtonNext.requestFocusInWindow();
 	}
 
 	private void onNo(ActionEvent e) {
@@ -269,6 +273,7 @@ public class FrameMain extends JFrame {
 		attempt.wordTitle = word.title;
 		attempt.date = new Date();
 		manager.addAttempt(attempt, false);
+		jButtonNext.requestFocusInWindow();
 	}
 
 	private void onClear(ActionEvent e) {
