@@ -1,11 +1,14 @@
 package wad;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Date;
 
 import javax.swing.JButton;
@@ -15,10 +18,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 public class FrameMain extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private final Manager manager;
+	private Manager manager;
 	private Word word;
 	private final JLabel jLabelTitle = new JLabel("Title");
 	private final JTextField jTextTitle = new JTextField();
@@ -30,7 +34,7 @@ public class FrameMain extends JFrame {
 	private final JButton jButtonNext = new JButton("Next");
 	private final JRadioButton jRadioYes = new JRadioButton("Yes");
 	private final JRadioButton jRadioNo = new JRadioButton("No");
-	private final JButton jButtonSave = new JButton("Save");
+	private final JButton jButtonAdd = new JButton("Add");
 	private final JTextField jTextResp = new JTextField();
 	private final JLabel jLabelStats = new JLabel();
 	private final JButton jButtonClear = new JButton("Clear");
@@ -43,20 +47,22 @@ public class FrameMain extends JFrame {
 	private final JButton jButtonUpdate = new JButton("Update");
 
 	public FrameMain(String configPath) {
-		manager = new Manager(configPath);
 		try {
+			manager = new Manager(configPath);
 			jbInit();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(FrameMain.this, e.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
 	private void jbInit() throws Exception {
-		this.getContentPane().setLayout(null);
-		this.setSize(600, 600);
-		this.setTitle("WAD");
-		this.setSize(new Dimension(700, 620));
+		Container cont = getContentPane();
+		cont.setLayout(null);
+		setTitle("WAD 25");
+		setSize(new Dimension(700, 620));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(25, 55, 130, 15));
 		jTextTitle.setBounds(new Rectangle(25, 75, 200, 25));
@@ -108,12 +114,12 @@ public class FrameMain extends JFrame {
 				onNo(e);
 			}
 		});
-		jButtonSave.setText("Save");
-		jButtonSave.setBounds(new Rectangle(445, 75, 80, 25));
-		jButtonSave.addActionListener(new ActionListener() {
+		jButtonAdd.setText("Add");
+		jButtonAdd.setBounds(new Rectangle(445, 75, 80, 25));
+		jButtonAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				onSave(e);
+				onAdd(e);
 			}
 		});
 		jTextResp.setBounds(new Rectangle(25, 25, 200, 25));
@@ -156,27 +162,42 @@ public class FrameMain extends JFrame {
 			}
 		});
 
-		this.getContentPane().add(jLabelNew, null);
-		this.getContentPane().add(jTextNew, null);
-		this.getContentPane().add(jLabelOld, null);
-		this.getContentPane().add(jTextOld, null);
-		this.getContentPane().add(jButtonClear, null);
-		this.getContentPane().add(jLabelStats, null);
-		this.getContentPane().add(jTextResp, null);
-		this.getContentPane().add(jButtonSave, null);
-		this.getContentPane().add(jRadioNo, null);
-		this.getContentPane().add(jRadioYes, null);
-		this.getContentPane().add(jButtonNext, null);
-		this.getContentPane().add(jButtonShow, null);
-		this.getContentPane().add(jTextExample, null);
-		this.getContentPane().add(jLabelExample, null);
-		this.getContentPane().add(jTextDef, null);
-		this.getContentPane().add(jLabelDef, null);
-		this.getContentPane().add(jTextTitle, null);
-		this.getContentPane().add(jLabelTitle, null);
-		this.getContentPane().add(jButtonMine, null);
-		this.getContentPane().add(jTextMine, null);
-		this.getContentPane().add(jButtonUpdate, null);
+		cont.add(jLabelNew, null);
+		cont.add(jTextNew, null);
+		cont.add(jLabelOld, null);
+		cont.add(jTextOld, null);
+		cont.add(jButtonClear, null);
+		cont.add(jLabelStats, null);
+		cont.add(jTextResp, null);
+		cont.add(jButtonAdd, null);
+		cont.add(jRadioNo, null);
+		cont.add(jRadioYes, null);
+		cont.add(jButtonNext, null);
+		cont.add(jButtonShow, null);
+		cont.add(jTextExample, null);
+		cont.add(jLabelExample, null);
+		cont.add(jTextDef, null);
+		cont.add(jLabelDef, null);
+		cont.add(jTextTitle, null);
+		cont.add(jLabelTitle, null);
+		cont.add(jButtonMine, null);
+		cont.add(jTextMine, null);
+		cont.add(jButtonUpdate, null);
+		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent evt) {
+				try {
+					manager.save();
+					FrameMain.this.dispose();
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(FrameMain.this, e.getMessage(), "Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 	}
 
 	private void onShow(ActionEvent e) {
@@ -251,7 +272,7 @@ public class FrameMain extends JFrame {
 		jTextResp.requestFocusInWindow();
 	}
 
-	private void onSave(ActionEvent e) {
+	private void onAdd(ActionEvent e) {
 		Word newWord = new Word();
 		newWord.title = jTextTitle.getText();
 		newWord.definition = jTextDef.getText();
@@ -299,7 +320,9 @@ public class FrameMain extends JFrame {
 			JOptionPane.showMessageDialog(this, "Title is empty", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		manager.updateTitle(title, newTitle);
-		jTextTitle.setText(jTextResp.getText());
+		boolean isUpdated = manager.updateTitle(title, newTitle);
+		if (isUpdated) {
+			jTextTitle.setText(jTextResp.getText());
+		}
 	}
 }

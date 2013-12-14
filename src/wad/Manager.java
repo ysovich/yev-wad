@@ -12,11 +12,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
@@ -37,7 +36,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -56,7 +54,7 @@ public class Manager {
 	private String DICT_PATH;
 	private String DICT_DOWN_PATH;
 
-	private Map<String, WordHistory> historyMap;
+	private LinkedHashMap<String, WordHistory> historyMap;
 	private int stats[];
 	private int oldCount;
 	private int newCount;
@@ -100,7 +98,7 @@ public class Manager {
 	public void load() {
 		try {
 			Document xmlDoc = loadXml(WORDS_PATH);
-			historyMap = new HashMap<String, WordHistory>();
+			historyMap = new LinkedHashMap<String, WordHistory>();
 			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
 			int len = nodeList.getLength();
 			for (int i = 0; i < len; ++i) {
@@ -115,7 +113,6 @@ public class Manager {
 
 				WordHistory wordHistory = new WordHistory();
 				wordHistory.word = word;
-				wordHistory.attemptList = new ArrayList<Attempt>();
 				historyMap.put(word.title, wordHistory);
 			}
 
@@ -143,101 +140,97 @@ public class Manager {
 		}
 	}
 
+	public void save() {
+		try {
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			docFactory.setNamespaceAware(true);
+			DocumentBuilder builder = docFactory.newDocumentBuilder();
+			Document xmlDocWords = builder.newDocument();
+			Element wordsEl = xmlDocWords.createElement("words");
+			xmlDocWords.appendChild(wordsEl);
+
+			Document xmlDocAttempts = builder.newDocument();
+			Element attemptsEl = xmlDocAttempts.createElement("attempts");
+			xmlDocAttempts.appendChild(attemptsEl);
+
+			for (WordHistory wordHistory : historyMap.values()) {
+				Element wordEl = xmlDocWords.createElement("word");
+				wordsEl.appendChild(wordEl);
+				wordEl.setAttribute("title", wordHistory.word.title);
+				if (wordHistory.word.isNew) {
+					wordEl.setAttribute("new", Boolean.toString(wordHistory.word.isNew));
+				}
+				Element defEl = xmlDocWords.createElement("definition");
+				wordEl.appendChild(defEl);
+				defEl.setTextContent(wordHistory.word.definition);
+				Element exampleEl = xmlDocWords.createElement("example");
+				wordEl.appendChild(exampleEl);
+				exampleEl.setTextContent(wordHistory.word.example);
+
+				for (Attempt attempt : wordHistory.attemptList) {
+					Element attemptEl = xmlDocAttempts.createElement("attempt");
+					attemptsEl.appendChild(attemptEl);
+					attemptEl.setAttribute("wordTitle", attempt.wordTitle);
+					attemptEl.setAttribute("date", dateFormat.format(attempt.date));
+				}
+			}
+
+			saveXml(xmlDocWords, WORDS_PATH);
+			saveXml(xmlDocAttempts, ATTEMPTS_PATH);
+		}
+		catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public void addWord(Word word) {
 		if (word.title == null || word.title.length() == 0) {
 			JOptionPane.showMessageDialog(null, "Missing title");
+			return;
+		}
+		if (word.definition == null || word.definition.length() == 0) {
+			JOptionPane.showMessageDialog(null, "Missing definition");
 			return;
 		}
 		if (historyMap.containsKey(word.title)) {
 			JOptionPane.showMessageDialog(null, "Title already exist");
 			return;
 		}
-		Document xmlDoc = loadXml(WORDS_PATH);
-		Element docEl = xmlDoc.getDocumentElement();
-		Element wordEl = xmlDoc.createElement("word");
-		docEl.appendChild(wordEl);
-		wordEl.setAttribute("title", word.title);
-		wordEl.setAttribute("new", Boolean.toString(word.isNew));
-		Element defEl = xmlDoc.createElement("definition");
-		wordEl.appendChild(defEl);
-		defEl.setTextContent(word.definition);
-		Element exampleEl = xmlDoc.createElement("example");
-		wordEl.appendChild(exampleEl);
-		exampleEl.setTextContent(word.example);
-		saveXml(xmlDoc, WORDS_PATH);
-		load();
+		WordHistory wordHistory = new WordHistory();
+		wordHistory.word = word;
+		historyMap.put(word.title, wordHistory);
 	}
 
 	public void removeWord(String wordTitle) {
-		try {
-			Document xmlDoc = loadXml(WORDS_PATH);
-			Element wordEl = null;
-			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
-			if (nodeList != null) {
-				for (int i = 0; i < nodeList.getLength(); ++i) {
-					Element el = (Element) nodeList.item(i);
-					if (wordTitle.equals(el.getAttribute("title"))) {
-						wordEl = el;
-						break;
-					}
-				}
-			}
-
-			if (wordEl != null) {
-				wordEl.getParentNode().removeChild(wordEl);
-				saveXml(xmlDoc, WORDS_PATH);
-				removeAllAttempts(wordTitle);
-				load();
-			}
-		}
-		catch (XPathExpressionException e) {
-			throw new RuntimeException(e);
-		}
+		historyMap.remove(wordTitle);
 	}
 
 	public void addAttempt(Attempt attempt, boolean isCorrect) {
-		Document xmlDoc = loadXml(ATTEMPTS_PATH);
-		Element docEl = xmlDoc.getDocumentElement();
+		WordHistory wordHist = historyMap.get(attempt.wordTitle);
 		boolean graduated = false;
 		if (isCorrect) {
 			Date now = new Date();
-			WordHistory wordHist = historyMap.get(attempt.wordTitle);
 			for (Attempt prevAttempt : wordHist.attemptList) {
 				if (calcDurationDays(now, prevAttempt.date) > YEAR) {
-					int confirm =
-							JOptionPane.showConfirmDialog(null, "Graduated!", "Graduated",
-									JOptionPane.YES_NO_OPTION);
+					int confirm = JOptionPane.showConfirmDialog(null, "Graduated!", "Graduated",
+							JOptionPane.YES_NO_OPTION);
 					graduated = JOptionPane.YES_OPTION == confirm;
 					break;
 				}
 			}
 		}
 
-		if (!isCorrect || graduated) {
-			NodeList nodeList = docEl.getChildNodes();
-			for (int i = nodeList.getLength() - 1; i >= 0; --i) {
-				Node node = nodeList.item(i);
-				if (node.getNodeType() == Node.ELEMENT_NODE) {
-					if (attempt.wordTitle.equals(((Element) node).getAttribute("wordTitle"))) {
-						docEl.removeChild(node);
-					}
-				}
-			}
-		}
 		if (graduated) {
-			removeWord(attempt.wordTitle);
+			historyMap.remove(attempt.wordTitle);
 		}
 		else if (isCorrect) {
-			Element attemptEl = xmlDoc.createElement("attempt");
-			docEl.appendChild(attemptEl);
-			attemptEl.setAttribute("wordTitle", attempt.wordTitle);
-			attemptEl.setAttribute("date", dateFormat.format(attempt.date));
+			wordHist.attemptList.add(attempt);
+		}
+		else {
+			wordHist.attemptList.clear();
 		}
 		lastAttempts.addFirst(attempt.wordTitle);
 		lastAttempts.pollLast();
-
-		saveXml(xmlDoc, ATTEMPTS_PATH);
-		load();
 	}
 
 	/**
@@ -261,10 +254,9 @@ public class Manager {
 		oldCount = newOldCount;
 		newCount = updateNewWords(newNewCount);
 		stats = new int[interval.length];
-		List<Word> candList = new ArrayList<Word>();
-		List<Word> doneList = new ArrayList<Word>();
-		for (Map.Entry<String, WordHistory> entry : historyMap.entrySet()) {
-			WordHistory hist = entry.getValue();
+		ArrayList<Word> candList = new ArrayList<Word>();
+		ArrayList<Word> doneList = new ArrayList<Word>();
+		for (WordHistory hist : historyMap.values()) {
 			if (hist.word.isNew) {
 				continue;
 			}
@@ -349,21 +341,6 @@ public class Manager {
 		return selWord;
 	}
 
-	public void removeAllAttempts(String wordTitle) {
-		Document xmlDoc = loadXml(ATTEMPTS_PATH);
-		Element docEl = xmlDoc.getDocumentElement();
-		NodeList nodeList = docEl.getChildNodes();
-		for (int i = 0; i < nodeList.getLength(); ++i) {
-			Node node = nodeList.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				if (wordTitle.equals(((Element) node).getAttribute("wordTitle"))) {
-					docEl.removeChild(node);
-				}
-			}
-		}
-		saveXml(xmlDoc, ATTEMPTS_PATH);
-	}
-
 	public String mine() {
 		StringBuilder selectedWords = new StringBuilder();
 		try {
@@ -416,58 +393,38 @@ public class Manager {
 		return selectedWords.toString();
 	}
 
-	public void updateTitle(String wordTitle, String newTitle) {
-		try {
-			Document xmlDoc = loadXml(WORDS_PATH);
-			Element wordEl = null;
-			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
-			if (nodeList != null) {
-				for (int i = 0; i < nodeList.getLength(); ++i) {
-					Element el = (Element) nodeList.item(i);
-					if (wordTitle.equals(el.getAttribute("title"))) {
-						wordEl = el;
-						break;
-					}
+	public boolean updateTitle(String wordTitle, String newTitle) {
+		boolean isUpdated = false;
+		WordHistory wordHistory = historyMap.get(newTitle);
+		if (wordHistory == null) {
+			wordHistory = historyMap.get(wordTitle);
+			if (wordHistory != null) {
+				historyMap.remove(wordTitle);
+				wordHistory.word.title = newTitle;
+				for (Attempt attempt : wordHistory.attemptList) {
+					attempt.wordTitle = newTitle;
 				}
+				historyMap.put(newTitle, wordHistory);
+				isUpdated = true;
 			}
-
-			if (wordEl != null) {
-				wordEl.setAttribute("title", newTitle);
-				saveXml(xmlDoc, WORDS_PATH);
-				updateAllAttempts(wordTitle, newTitle);
-				load();
+			else {
+				JOptionPane.showMessageDialog(null, "Word not found " + wordTitle);
 			}
 		}
-		catch (XPathExpressionException e) {
-			throw new RuntimeException(e);
+		else {
+			JOptionPane.showMessageDialog(null, "Word already exists " + newTitle);
 		}
+		return isUpdated;
 	}
 
 	public int getRemainingNewCount() {
 		int retCount = 0;
-		for (Map.Entry<String, WordHistory> entry : historyMap.entrySet()) {
-			WordHistory hist = entry.getValue();
-			if (hist.word.isNew) {
+		for (WordHistory wordHistory : historyMap.values()) {
+			if (wordHistory.word.isNew) {
 				++retCount;
 			}
 		}
 		return retCount;
-	}
-
-	private void updateAllAttempts(String wordTitle, String newTitle) {
-		Document xmlDoc = loadXml(ATTEMPTS_PATH);
-		Element docEl = xmlDoc.getDocumentElement();
-		NodeList nodeList = docEl.getChildNodes();
-		for (int i = 0; i < nodeList.getLength(); ++i) {
-			Node node = nodeList.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element element = (Element) node;
-				if (wordTitle.equals(element.getAttribute("wordTitle"))) {
-					element.setAttribute("wordTitle", newTitle);
-				}
-			}
-		}
-		saveXml(xmlDoc, ATTEMPTS_PATH);
 	}
 
 	private Date clearDate(Date date) {
@@ -493,26 +450,13 @@ public class Manager {
 		}
 		int retWordCount = newWordCount;
 
-		try {
-			Document xmlDoc = loadXml(WORDS_PATH);
-			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
-			if (nodeList != null) {
-				for (int i = 0; i < nodeList.getLength() && retWordCount > 0; ++i) {
-					Element el = (Element) nodeList.item(i);
-					if (Boolean.TRUE.toString().equals(el.getAttribute("new"))) {
-						el.removeAttribute("new");
-						--retWordCount;
-					}
-				}
+		for (Iterator<WordHistory> it = historyMap.values().iterator(); it.hasNext()
+				&& retWordCount > 0;) {
+			WordHistory wordHistory = it.next();
+			if (wordHistory.word.isNew) {
+				wordHistory.word.isNew = false;
+				--retWordCount;
 			}
-
-			if (newWordCount > 0 && newWordCount != retWordCount) {
-				saveXml(xmlDoc, WORDS_PATH);
-				load();
-			}
-		}
-		catch (XPathExpressionException e) {
-			throw new RuntimeException(e);
 		}
 
 		return retWordCount;
