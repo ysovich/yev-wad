@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 25");
+		setTitle("WAD 26");
 		setSize(new Dimension(700, 620));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(25, 55, 130, 15));
@@ -282,18 +282,12 @@ public class FrameMain extends JFrame {
 	}
 
 	private void onYes(ActionEvent e) {
-		Attempt attempt = new Attempt();
-		attempt.wordTitle = word.title;
-		attempt.date = new Date();
-		manager.addAttempt(attempt, true);
+		manager.addAttempt(word.title, new Date(), true);
 		jButtonNext.requestFocusInWindow();
 	}
 
 	private void onNo(ActionEvent e) {
-		Attempt attempt = new Attempt();
-		attempt.wordTitle = word.title;
-		attempt.date = new Date();
-		manager.addAttempt(attempt, false);
+		manager.addAttempt(word.title, new Date(), false);
 		jButtonNext.requestFocusInWindow();
 	}
 

@@ -29,20 +29,16 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class Manager {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	private static final XPath xpath = XPathFactory.newInstance().newXPath();
 	private static final long MINUTE = 1000 * 60;
 	private static final long HOUR = 60 * MINUTE;
 	private static final long DAY = 24 * HOUR;
@@ -50,11 +46,10 @@ public class Manager {
 	private static final long interval[] = { 28 * DAY, 7 * DAY, 3 * DAY, DAY, HOUR, MINUTE, 0 };
 	public static final String intervalLbl[] = { "Y", "M", "W", "T", "D", "H", "M" };
 	private String WORDS_PATH;
-	private String ATTEMPTS_PATH;
 	private String DICT_PATH;
 	private String DICT_DOWN_PATH;
 
-	private LinkedHashMap<String, WordHistory> historyMap;
+	private LinkedHashMap<String, Word> wordMap;
 	private int stats[];
 	private int oldCount;
 	private int newCount;
@@ -69,7 +64,6 @@ public class Manager {
 		try {
 			prop.load(new FileInputStream(configPath));
 			WORDS_PATH = prop.getProperty("words");
-			ATTEMPTS_PATH = prop.getProperty("attempts");
 			DICT_PATH = prop.getProperty("dict");
 			DICT_DOWN_PATH = prop.getProperty("down");
 		}
@@ -96,47 +90,44 @@ public class Manager {
 	}
 
 	public void load() {
-		try {
-			Document xmlDoc = loadXml(WORDS_PATH);
-			historyMap = new LinkedHashMap<String, WordHistory>();
-			NodeList nodeList = (NodeList) xpath.evaluate("/words/word", xmlDoc, XPathConstants.NODESET);
-			int len = nodeList.getLength();
-			for (int i = 0; i < len; ++i) {
-				Element wordEl = (Element) nodeList.item(i);
+		wordMap = new LinkedHashMap<String, Word>();
+		Document xmlDoc = loadXml(WORDS_PATH);
+		Element rootEl = xmlDoc.getDocumentElement();
+		NodeList rootChildList = rootEl.getChildNodes();
+		int len = rootChildList.getLength();
+		for (int i = 0; i < len; ++i) {
+			Node rcNode = rootChildList.item(i);
+			if (Node.ELEMENT_NODE == rcNode.getNodeType()) {
+				Element wordEl = (Element) rcNode;
 				Word word = new Word();
-				word.title = wordEl.getAttribute("title");
-				word.isNew = Boolean.TRUE.toString().equals(wordEl.getAttribute("new"));
-				Element defEl = (Element) xpath.evaluate("./definition", wordEl, XPathConstants.NODE);
-				word.definition = defEl.getTextContent();
-				Element exampleEl = (Element) xpath.evaluate("./example", wordEl, XPathConstants.NODE);
-				word.example = exampleEl.getTextContent();
+				word.title = wordEl.getAttribute("t");
+				word.isNew = Boolean.TRUE.toString().equals(wordEl.getAttribute("n"));
+				wordMap.put(word.title, word);
 
-				WordHistory wordHistory = new WordHistory();
-				wordHistory.word = word;
-				historyMap.put(word.title, wordHistory);
-			}
-
-			xmlDoc = loadXml(ATTEMPTS_PATH);
-			nodeList = (NodeList) xpath.evaluate("/attempts/attempt", xmlDoc, XPathConstants.NODESET);
-			len = nodeList.getLength();
-			for (int i = 0; i < len; ++i) {
-				Element attemptEl = (Element) nodeList.item(i);
-				Attempt attempt = new Attempt();
-				attempt.wordTitle = attemptEl.getAttribute("wordTitle");
-				attempt.date = dateFormat.parse(attemptEl.getAttribute("date"));
-
-				WordHistory wordHistory = historyMap.get(attempt.wordTitle);
-				if (wordHistory == null) {
-					throw new RuntimeException(attempt.wordTitle);
+				NodeList wordChildList = wordEl.getChildNodes();
+				int wcLen = wordChildList.getLength();
+				for (int j = 0; j < wcLen; ++j) {
+					Node wcNode = wordChildList.item(j);
+					if (Node.ELEMENT_NODE == wcNode.getNodeType()) {
+						Element childEl = (Element) wcNode;
+						if ("d".equals(childEl.getNodeName())) {
+							word.definition = childEl.getTextContent();
+						}
+						else if ("e".equals(childEl.getNodeName())) {
+							word.example = childEl.getTextContent();
+						}
+						else if ("a".equals(childEl.getNodeName())) {
+							try {
+								Date attemptDate = dateFormat.parse(childEl.getTextContent());
+								word.attemptList.add(attemptDate);
+							}
+							catch (ParseException e) {
+								throw new RuntimeException(e);
+							}
+						}
+					}
 				}
-				wordHistory.attemptList.add(attempt);
 			}
-		}
-		catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
-		catch (XPathExpressionException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -145,38 +136,32 @@ public class Manager {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			docFactory.setNamespaceAware(true);
 			DocumentBuilder builder = docFactory.newDocumentBuilder();
-			Document xmlDocWords = builder.newDocument();
-			Element wordsEl = xmlDocWords.createElement("words");
-			xmlDocWords.appendChild(wordsEl);
+			Document xmlDoc = builder.newDocument();
+			Element wadEl = xmlDoc.createElement("wad");
+			xmlDoc.appendChild(wadEl);
 
-			Document xmlDocAttempts = builder.newDocument();
-			Element attemptsEl = xmlDocAttempts.createElement("attempts");
-			xmlDocAttempts.appendChild(attemptsEl);
-
-			for (WordHistory wordHistory : historyMap.values()) {
-				Element wordEl = xmlDocWords.createElement("word");
-				wordsEl.appendChild(wordEl);
-				wordEl.setAttribute("title", wordHistory.word.title);
-				if (wordHistory.word.isNew) {
-					wordEl.setAttribute("new", Boolean.toString(wordHistory.word.isNew));
+			for (Word word : wordMap.values()) {
+				Element wordEl = xmlDoc.createElement("w");
+				wadEl.appendChild(wordEl);
+				wordEl.setAttribute("t", word.title);
+				if (word.isNew) {
+					wordEl.setAttribute("n", Boolean.toString(word.isNew));
 				}
-				Element defEl = xmlDocWords.createElement("definition");
+				Element defEl = xmlDoc.createElement("d");
 				wordEl.appendChild(defEl);
-				defEl.setTextContent(wordHistory.word.definition);
-				Element exampleEl = xmlDocWords.createElement("example");
+				defEl.setTextContent(word.definition);
+				Element exampleEl = xmlDoc.createElement("e");
 				wordEl.appendChild(exampleEl);
-				exampleEl.setTextContent(wordHistory.word.example);
+				exampleEl.setTextContent(word.example);
 
-				for (Attempt attempt : wordHistory.attemptList) {
-					Element attemptEl = xmlDocAttempts.createElement("attempt");
-					attemptsEl.appendChild(attemptEl);
-					attemptEl.setAttribute("wordTitle", attempt.wordTitle);
-					attemptEl.setAttribute("date", dateFormat.format(attempt.date));
+				for (Date attemptDate : word.attemptList) {
+					Element attemptEl = xmlDoc.createElement("a");
+					wordEl.appendChild(attemptEl);
+					attemptEl.setTextContent(dateFormat.format(attemptDate));
 				}
 			}
 
-			saveXml(xmlDocWords, WORDS_PATH);
-			saveXml(xmlDocAttempts, ATTEMPTS_PATH);
+			saveXml(xmlDoc, WORDS_PATH);
 		}
 		catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
@@ -192,26 +177,24 @@ public class Manager {
 			JOptionPane.showMessageDialog(null, "Missing definition");
 			return;
 		}
-		if (historyMap.containsKey(word.title)) {
+		if (wordMap.containsKey(word.title)) {
 			JOptionPane.showMessageDialog(null, "Title already exist");
 			return;
 		}
-		WordHistory wordHistory = new WordHistory();
-		wordHistory.word = word;
-		historyMap.put(word.title, wordHistory);
+		wordMap.put(word.title, word);
 	}
 
 	public void removeWord(String wordTitle) {
-		historyMap.remove(wordTitle);
+		wordMap.remove(wordTitle);
 	}
 
-	public void addAttempt(Attempt attempt, boolean isCorrect) {
-		WordHistory wordHist = historyMap.get(attempt.wordTitle);
+	public void addAttempt(String wordTitle, Date attemptDate, boolean isCorrect) {
+		Word word = wordMap.get(wordTitle);
 		boolean graduated = false;
 		if (isCorrect) {
 			Date now = new Date();
-			for (Attempt prevAttempt : wordHist.attemptList) {
-				if (calcDurationDays(now, prevAttempt.date) > YEAR) {
+			for (Date prevAttemptDate : word.attemptList) {
+				if (calcDurationDays(now, prevAttemptDate) > YEAR) {
 					int confirm = JOptionPane.showConfirmDialog(null, "Graduated!", "Graduated",
 							JOptionPane.YES_NO_OPTION);
 					graduated = JOptionPane.YES_OPTION == confirm;
@@ -221,15 +204,15 @@ public class Manager {
 		}
 
 		if (graduated) {
-			historyMap.remove(attempt.wordTitle);
+			wordMap.remove(wordTitle);
 		}
 		else if (isCorrect) {
-			wordHist.attemptList.add(attempt);
+			word.attemptList.add(attemptDate);
 		}
 		else {
-			wordHist.attemptList.clear();
+			word.attemptList.clear();
 		}
-		lastAttempts.addFirst(attempt.wordTitle);
+		lastAttempts.addFirst(wordTitle);
 		lastAttempts.pollLast();
 	}
 
@@ -256,41 +239,41 @@ public class Manager {
 		stats = new int[interval.length];
 		ArrayList<Word> candList = new ArrayList<Word>();
 		ArrayList<Word> doneList = new ArrayList<Word>();
-		for (WordHistory hist : historyMap.values()) {
-			if (hist.word.isNew) {
+		for (Word word : wordMap.values()) {
+			if (word.isNew) {
 				continue;
 			}
 			long dur = 0;
 			Date now = new Date();
 			Date lastDate = now;
-			if (hist.attemptList.size() > 1) {
-				Attempt prev = hist.attemptList.get(0);
-				for (int i = 1; i < hist.attemptList.size(); ++i) {
-					Attempt cur = hist.attemptList.get(i);
-					long curDur = calcDurationDays(cur.date, prev.date);
+			if (word.attemptList.size() > 1) {
+				Date prevDate = word.attemptList.get(0);
+				for (int i = 1; i < word.attemptList.size(); ++i) {
+					Date curDate = word.attemptList.get(i);
+					long curDur = calcDurationDays(curDate, prevDate);
 					if (curDur == 0) {
-						curDur = cur.date.getTime() - prev.date.getTime();
+						curDur = curDate.getTime() - prevDate.getTime();
 					}
 					if (curDur > dur) {
 						dur = curDur;
 					}
-					lastDate = cur.date;
-					prev = cur;
+					lastDate = curDate;
+					prevDate = curDate;
 				}
 			}
 
 			if (dur > 0) {
 				if (dur >= interval[0]) {
 					++stats[0];
-					Date firstAttemptDate = hist.attemptList.get(0).date;
+					Date firstAttemptDate = word.attemptList.get(0);
 					if (calcDurationDays(now, firstAttemptDate) > YEAR) {
-						candList.add(hist.word);
+						candList.add(word);
 					}
 					else if (calcDurationDays(now, lastDate) > DAY * 90) {
-						candList.add(hist.word);
+						candList.add(word);
 					}
 					else {
-						doneList.add(hist.word);
+						doneList.add(word);
 					}
 				}
 				else {
@@ -298,12 +281,12 @@ public class Manager {
 						if (dur >= interval[i]) {
 							if (interval[i] >= HOUR) {
 								if (calcDurationDays(now, lastDate) >= interval[i - 1]) {
-									candList.add(hist.word);
+									candList.add(word);
 								}
 							}
 							else {
 								if (now.getTime() - lastDate.getTime() >= interval[i - 1]) {
-									candList.add(hist.word);
+									candList.add(word);
 								}
 							}
 							++stats[i];
@@ -313,7 +296,7 @@ public class Manager {
 				}
 			}
 			else {
-				candList.add(hist.word);
+				candList.add(word);
 				++stats[stats.length - 1];
 			}
 		}
@@ -325,9 +308,9 @@ public class Manager {
 		if (!candList.isEmpty()) {
 			for (String lastAttempt : lastAttempts) {
 				if (candList.size() > 1) {
-					WordHistory wordHist = historyMap.get(lastAttempt);
-					if (wordHist != null) {
-						candList.remove(wordHist.word);
+					Word word = wordMap.get(lastAttempt);
+					if (word != null) {
+						candList.remove(word);
 					}
 				}
 			}
@@ -395,16 +378,13 @@ public class Manager {
 
 	public boolean updateTitle(String wordTitle, String newTitle) {
 		boolean isUpdated = false;
-		WordHistory wordHistory = historyMap.get(newTitle);
-		if (wordHistory == null) {
-			wordHistory = historyMap.get(wordTitle);
-			if (wordHistory != null) {
-				historyMap.remove(wordTitle);
-				wordHistory.word.title = newTitle;
-				for (Attempt attempt : wordHistory.attemptList) {
-					attempt.wordTitle = newTitle;
-				}
-				historyMap.put(newTitle, wordHistory);
+		Word word = wordMap.get(newTitle);
+		if (word == null) {
+			word = wordMap.get(wordTitle);
+			if (word != null) {
+				wordMap.remove(wordTitle);
+				word.title = newTitle;
+				wordMap.put(newTitle, word);
 				isUpdated = true;
 			}
 			else {
@@ -419,8 +399,8 @@ public class Manager {
 
 	public int getRemainingNewCount() {
 		int retCount = 0;
-		for (WordHistory wordHistory : historyMap.values()) {
-			if (wordHistory.word.isNew) {
+		for (Word word : wordMap.values()) {
+			if (word.isNew) {
 				++retCount;
 			}
 		}
@@ -450,11 +430,10 @@ public class Manager {
 		}
 		int retWordCount = newWordCount;
 
-		for (Iterator<WordHistory> it = historyMap.values().iterator(); it.hasNext()
-				&& retWordCount > 0;) {
-			WordHistory wordHistory = it.next();
-			if (wordHistory.word.isNew) {
-				wordHistory.word.isNew = false;
+		for (Iterator<Word> it = wordMap.values().iterator(); it.hasNext() && retWordCount > 0;) {
+			Word word = it.next();
+			if (word.isNew) {
+				word.isNew = false;
 				--retWordCount;
 			}
 		}
