@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 26");
+		setTitle("WAD 27");
 		setSize(new Dimension(700, 620));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(25, 55, 130, 15));
@@ -184,11 +184,27 @@ public class FrameMain extends JFrame {
 		cont.add(jTextMine, null);
 		cont.add(jButtonUpdate, null);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		addWindowListener(new WindowAdapter() {
+		class ClosingListener extends WindowAdapter {
+			private int dataHashCode;
+
+			public ClosingListener(int dataHashCode) {
+				this.dataHashCode = dataHashCode;
+			}
+
 			@Override
 			public void windowClosing(WindowEvent evt) {
 				try {
-					manager.save();
+					if (manager.getDataHashCode() == dataHashCode) {
+						int confirm =
+								JOptionPane.showConfirmDialog(null, "No change, save anyway?", "Save",
+										JOptionPane.YES_NO_OPTION);
+						if (JOptionPane.YES_OPTION == confirm) {
+							manager.save();
+						}
+					}
+					else {
+						manager.save();
+					}
 					FrameMain.this.dispose();
 				}
 				catch (Exception e) {
@@ -197,7 +213,9 @@ public class FrameMain extends JFrame {
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
-		});
+		}
+		ClosingListener closingListener = new ClosingListener(manager.getDataHashCode());
+		addWindowListener(closingListener);
 	}
 
 	private void onShow(ActionEvent e) {

@@ -89,6 +89,10 @@ public class Manager {
 		return candCount;
 	}
 
+	public int getDataHashCode() {
+		return wordMap.hashCode();
+	}
+
 	public void load() {
 		wordMap = new LinkedHashMap<String, Word>();
 		Document xmlDoc = loadXml(WORDS_PATH);
@@ -195,8 +199,9 @@ public class Manager {
 			Date now = new Date();
 			for (Date prevAttemptDate : word.attemptList) {
 				if (calcDurationDays(now, prevAttemptDate) > YEAR) {
-					int confirm = JOptionPane.showConfirmDialog(null, "Graduated!", "Graduated",
-							JOptionPane.YES_NO_OPTION);
+					int confirm =
+							JOptionPane.showConfirmDialog(null, "Graduated!", "Graduated",
+									JOptionPane.YES_NO_OPTION);
 					graduated = JOptionPane.YES_OPTION == confirm;
 					break;
 				}
