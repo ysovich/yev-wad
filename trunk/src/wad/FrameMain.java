@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 27");
+		setTitle("WAD 28");
 		setSize(new Dimension(700, 620));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(25, 55, 130, 15));
@@ -196,7 +196,7 @@ public class FrameMain extends JFrame {
 				try {
 					if (manager.getDataHashCode() == dataHashCode) {
 						int confirm =
-								JOptionPane.showConfirmDialog(null, "No change, save anyway?", "Save",
+								JOptionPane.showConfirmDialog(FrameMain.this, "No change, save anyway?", "Save",
 										JOptionPane.YES_NO_OPTION);
 						if (JOptionPane.YES_OPTION == confirm) {
 							manager.save();
