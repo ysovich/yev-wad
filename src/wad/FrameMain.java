@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 28");
+		setTitle("WAD 29");
 		setSize(new Dimension(700, 620));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(25, 55, 130, 15));
