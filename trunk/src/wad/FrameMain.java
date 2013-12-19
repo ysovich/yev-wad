@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 29");
+		setTitle("WAD 30");
 		setSize(new Dimension(700, 620));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(25, 55, 130, 15));
@@ -300,7 +300,18 @@ public class FrameMain extends JFrame {
 	}
 
 	private void onYes(ActionEvent e) {
-		manager.addAttempt(word.title, new Date(), true);
+		Word graduatedWord = manager.addAttempt(word.title, new Date(), true);
+		if (graduatedWord != null) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("GRADUATED!");
+			sb.append("\n\n");
+			sb.append(graduatedWord.title);
+			sb.append("\n\n");
+			sb.append(graduatedWord.definition);
+			sb.append("\n\n");
+			sb.append(graduatedWord.example);
+			jTextMine.setText(sb.toString());
+		}
 		jButtonNext.requestFocusInWindow();
 	}
 
