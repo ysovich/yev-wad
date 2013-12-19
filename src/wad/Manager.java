@@ -192,17 +192,15 @@ public class Manager {
 		wordMap.remove(wordTitle);
 	}
 
-	public void addAttempt(String wordTitle, Date attemptDate, boolean isCorrect) {
+	public Word addAttempt(String wordTitle, Date attemptDate, boolean isCorrect) {
+		Word graduatedWord = null;
 		Word word = wordMap.get(wordTitle);
 		boolean graduated = false;
 		if (isCorrect) {
 			Date now = new Date();
 			for (Date prevAttemptDate : word.attemptList) {
 				if (calcDurationDays(now, prevAttemptDate) > YEAR) {
-					int confirm =
-							JOptionPane.showConfirmDialog(null, "Graduated!", "Graduated",
-									JOptionPane.YES_NO_OPTION);
-					graduated = JOptionPane.YES_OPTION == confirm;
+					graduated = true;
 					break;
 				}
 			}
@@ -210,6 +208,7 @@ public class Manager {
 
 		if (graduated) {
 			wordMap.remove(wordTitle);
+			graduatedWord = word;
 		}
 		else if (isCorrect) {
 			word.attemptList.add(attemptDate);
@@ -219,6 +218,7 @@ public class Manager {
 		}
 		lastAttempts.addFirst(wordTitle);
 		lastAttempts.pollLast();
+		return graduatedWord;
 	}
 
 	/**
