@@ -44,7 +44,7 @@ public class FrameMain extends JFrame {
 	private final JLabel jLabelNew = new JLabel();
 	private final JButton jButtonMine = new JButton("Mine");
 	private final JTextArea jTextMine = new JTextArea();
-	private final JButton jButtonUpdate = new JButton("Update");
+	private final JButton jButtonEdit = new JButton("Edit");
 
 	public FrameMain(String configPath) {
 		try {
@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 30");
+		setTitle("WAD 31");
 		setSize(new Dimension(700, 620));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(25, 55, 130, 15));
@@ -127,7 +127,7 @@ public class FrameMain extends JFrame {
 		jLabelStats.setText("");
 		jLabelStats.setBounds(new Rectangle(25, 555, 500, 15));
 		jButtonClear.setText("Clear");
-		jButtonClear.setBounds(new Rectangle(345, 75, 80, 25));
+		jButtonClear.setBounds(new Rectangle(545, 25, 80, 25));
 		jButtonClear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -153,12 +153,12 @@ public class FrameMain extends JFrame {
 		jTextMine.setBounds(new Rectangle(545, 130, 120, 410));
 		jTextMine.setFont(new Font("Tahoma", 0, 16));
 		jTextMine.setLineWrap(true);
-		jButtonUpdate.setText("Update");
-		jButtonUpdate.setBounds(new Rectangle(545, 25, 80, 25));
-		jButtonUpdate.addActionListener(new ActionListener() {
+		jButtonEdit.setText("Edit");
+		jButtonEdit.setBounds(new Rectangle(345, 75, 80, 25));
+		jButtonEdit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				onUpdate(e);
+				onEdit(e);
 			}
 		});
 
@@ -182,7 +182,7 @@ public class FrameMain extends JFrame {
 		cont.add(jLabelTitle, null);
 		cont.add(jButtonMine, null);
 		cont.add(jTextMine, null);
-		cont.add(jButtonUpdate, null);
+		cont.add(jButtonEdit, null);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		class ClosingListener extends WindowAdapter {
 			private int dataHashCode;
@@ -195,9 +195,8 @@ public class FrameMain extends JFrame {
 			public void windowClosing(WindowEvent evt) {
 				try {
 					if (manager.getDataHashCode() == dataHashCode) {
-						int confirm =
-								JOptionPane.showConfirmDialog(FrameMain.this, "No change, save anyway?", "Save",
-										JOptionPane.YES_NO_OPTION);
+						int confirm = JOptionPane.showConfirmDialog(FrameMain.this, "No change, save anyway?",
+								"Save", JOptionPane.YES_NO_OPTION);
 						if (JOptionPane.YES_OPTION == confirm) {
 							manager.save();
 						}
@@ -336,7 +335,33 @@ public class FrameMain extends JFrame {
 		jTextMine.setText(selectedWords);
 	}
 
-	private void onUpdate(ActionEvent e) {
+	private void onEdit(ActionEvent e) {
+		Object[] options = { "Find", "Change Title", "Update" };
+		int choice = JOptionPane.showOptionDialog(this, "Choose edit operation", "Edit",
+				JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+		if (0 == choice) {
+			onFind();
+		}
+		else if (1 == choice) {
+			onChangeTitle();
+		}
+		else if (2 == choice) {
+			onUpdate();
+		}
+	}
+
+	private void onFind() {
+		String wordTitle = jTextResp.getText().trim();
+		Word foundWord = manager.findWord(wordTitle);
+		if (foundWord != null) {
+			word = foundWord;
+			jTextTitle.setText(word.title);
+			jTextDef.setText(word.definition);
+			jTextExample.setText(word.example);
+		}
+	}
+
+	private void onChangeTitle() {
 		String title = jTextTitle.getText().trim();
 		String newTitle = jTextResp.getText().trim();
 		if (title.isEmpty() || newTitle.isEmpty()) {
@@ -348,4 +373,12 @@ public class FrameMain extends JFrame {
 			jTextTitle.setText(jTextResp.getText());
 		}
 	}
+
+	private void onUpdate() {
+		if (word != null) {
+			word.definition = jTextDef.getText();
+			word.example = jTextExample.getText();
+		}
+	}
+
 }

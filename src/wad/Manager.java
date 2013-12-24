@@ -412,6 +412,10 @@ public class Manager {
 		return retCount;
 	}
 
+	public Word findWord(String wordTitle) {
+		return wordMap.get(wordTitle);
+	}
+
 	private Date clearDate(Date date) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(date);
