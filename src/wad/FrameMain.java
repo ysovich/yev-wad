@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 32");
+		setTitle("WAD 33");
 		setSize(new Dimension(700, 630));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(15, 55, 130, 15));
@@ -115,7 +115,7 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jButtonAdd.setText("Add");
-		jButtonAdd.setBounds(new Rectangle(285, 550, 80, 25));
+		jButtonAdd.setBounds(new Rectangle(320, 550, 75, 25));
 		jButtonAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -125,9 +125,9 @@ public class FrameMain extends JFrame {
 		jTextResp.setBounds(new Rectangle(15, 25, 460, 25));
 		jTextResp.setFont(new Font("Tahoma", 0, 16));
 		jLabelStats.setText("");
-		jLabelStats.setBounds(new Rectangle(15, 555, 270, 15));
+		jLabelStats.setBounds(new Rectangle(15, 555, 305, 15));
 		jButtonClear.setText("Clear");
-		jButtonClear.setBounds(new Rectangle(485, 550, 80, 25));
+		jButtonClear.setBounds(new Rectangle(500, 550, 75, 25));
 		jButtonClear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -143,7 +143,7 @@ public class FrameMain extends JFrame {
 		jLabelNew.setText("New");
 		jLabelNew.setBounds(new Rectangle(650, 75, 25, 25));
 		jButtonMine.setText("Mine");
-		jButtonMine.setBounds(new Rectangle(585, 550, 80, 25));
+		jButtonMine.setBounds(new Rectangle(590, 550, 75, 25));
 		jButtonMine.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -154,7 +154,7 @@ public class FrameMain extends JFrame {
 		jTextMine.setFont(new Font("Tahoma", 0, 16));
 		jTextMine.setLineWrap(true);
 		jButtonEdit.setText("Edit");
-		jButtonEdit.setBounds(new Rectangle(385, 550, 80, 25));
+		jButtonEdit.setBounds(new Rectangle(410, 550, 75, 25));
 		jButtonEdit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
