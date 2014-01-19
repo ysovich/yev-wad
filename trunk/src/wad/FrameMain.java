@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 33");
+		setTitle("WAD 34");
 		setSize(new Dimension(700, 630));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(15, 55, 130, 15));
@@ -215,6 +215,7 @@ public class FrameMain extends JFrame {
 		}
 		ClosingListener closingListener = new ClosingListener(manager.getDataHashCode());
 		addWindowListener(closingListener);
+		updateStats();
 	}
 
 	private void onShow(ActionEvent e) {
@@ -268,6 +269,11 @@ public class FrameMain extends JFrame {
 			jRadioNo.setEnabled(true);
 			jButtonShow.setEnabled(true);
 		}
+		updateStats();
+		jTextResp.requestFocusInWindow();
+	}
+
+	private void updateStats() {
 		int[] stats = manager.getStats();
 		StringBuilder statsStr = new StringBuilder();
 		int total = 0;
@@ -286,7 +292,6 @@ public class FrameMain extends JFrame {
 		statsStr.append(" C:");
 		statsStr.append(manager.getCandCount());
 		jLabelStats.setText(statsStr.toString());
-		jTextResp.requestFocusInWindow();
 	}
 
 	private void onAdd(ActionEvent e) {
@@ -296,6 +301,8 @@ public class FrameMain extends JFrame {
 		newWord.example = jTextExample.getText();
 		newWord.isNew = true;
 		manager.addWord(newWord);
+		updateStats();
+		onClear(e);
 	}
 
 	private void onYes(ActionEvent e) {
