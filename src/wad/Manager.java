@@ -71,6 +71,7 @@ public class Manager {
 			throw new RuntimeException(e);
 		}
 		load();
+		prepareCandidateList(new ArrayList<Word>(), new ArrayList<Word>());
 	}
 
 	public int[] getStats() {
@@ -241,9 +242,36 @@ public class Manager {
 	public Word getNextWord(int newOldCount, int newNewCount) {
 		oldCount = newOldCount;
 		newCount = updateNewWords(newNewCount);
-		stats = new int[interval.length];
+
 		ArrayList<Word> candList = new ArrayList<Word>();
 		ArrayList<Word> doneList = new ArrayList<Word>();
+
+		prepareCandidateList(candList, doneList);
+
+		Word selWord = null;
+		Random rnd = new Random();
+		if (!candList.isEmpty()) {
+			for (String lastAttempt : lastAttempts) {
+				if (candList.size() > 1) {
+					Word word = wordMap.get(lastAttempt);
+					if (word != null) {
+						candList.remove(word);
+					}
+				}
+			}
+			selWord = candList.get(rnd.nextInt(candList.size()));
+		}
+		if (oldCount > 0 && selWord == null && !doneList.isEmpty()) {
+			selWord = doneList.get(rnd.nextInt(doneList.size()));
+			--oldCount;
+		}
+
+		return selWord;
+	}
+
+	private void prepareCandidateList(ArrayList<Word> candList, ArrayList<Word> doneList) {
+		stats = new int[interval.length];
+		
 		for (Word word : wordMap.values()) {
 			if (word.isNew) {
 				continue;
@@ -307,26 +335,6 @@ public class Manager {
 		}
 
 		candCount = candList.size();
-
-		Word selWord = null;
-		Random rnd = new Random();
-		if (!candList.isEmpty()) {
-			for (String lastAttempt : lastAttempts) {
-				if (candList.size() > 1) {
-					Word word = wordMap.get(lastAttempt);
-					if (word != null) {
-						candList.remove(word);
-					}
-				}
-			}
-			selWord = candList.get(rnd.nextInt(candList.size()));
-		}
-		if (oldCount > 0 && selWord == null && !doneList.isEmpty()) {
-			selWord = doneList.get(rnd.nextInt(doneList.size()));
-			--oldCount;
-		}
-
-		return selWord;
 	}
 
 	public String mine() {
