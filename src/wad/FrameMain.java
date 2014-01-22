@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 34");
+		setTitle("WAD 35");
 		setSize(new Dimension(700, 630));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(15, 55, 130, 15));
@@ -195,8 +195,9 @@ public class FrameMain extends JFrame {
 			public void windowClosing(WindowEvent evt) {
 				try {
 					if (manager.getDataHashCode() == dataHashCode) {
-						int confirm = JOptionPane.showConfirmDialog(FrameMain.this, "No change, save anyway?",
-								"Save", JOptionPane.YES_NO_OPTION);
+						int confirm =
+								JOptionPane.showConfirmDialog(FrameMain.this, "No change, save anyway?", "Save",
+										JOptionPane.YES_NO_OPTION);
 						if (JOptionPane.YES_OPTION == confirm) {
 							manager.save();
 						}
@@ -302,7 +303,7 @@ public class FrameMain extends JFrame {
 		newWord.isNew = true;
 		manager.addWord(newWord);
 		updateStats();
-		onClear(e);
+		clearWord();
 	}
 
 	private void onYes(ActionEvent e) {
@@ -327,11 +328,15 @@ public class FrameMain extends JFrame {
 	}
 
 	private void onClear(ActionEvent e) {
+		clearWord();
+		jTextMine.setText("");
+	}
+
+	private void clearWord() {
 		jTextTitle.setText("");
 		jTextResp.setText("");
 		jTextDef.setText("");
 		jTextExample.setText("");
-		jTextMine.setText("");
 		jRadioYes.setSelected(false);
 		jRadioNo.setSelected(false);
 		jTextResp.setForeground(Color.black);
@@ -344,8 +349,9 @@ public class FrameMain extends JFrame {
 
 	private void onEdit(ActionEvent e) {
 		Object[] options = { "Find", "Change Title", "Update" };
-		int choice = JOptionPane.showOptionDialog(this, "Choose edit operation", "Edit",
-				JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+		int choice =
+				JOptionPane.showOptionDialog(this, "Choose edit operation", "Edit",
+						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 		if (0 == choice) {
 			onFind();
 		}
