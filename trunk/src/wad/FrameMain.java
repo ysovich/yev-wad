@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 35");
+		setTitle("WAD 36");
 		setSize(new Dimension(700, 630));
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(15, 55, 130, 15));
@@ -301,9 +301,10 @@ public class FrameMain extends JFrame {
 		newWord.definition = jTextDef.getText();
 		newWord.example = jTextExample.getText();
 		newWord.isNew = true;
-		manager.addWord(newWord);
-		updateStats();
-		clearWord();
+		if (manager.addWord(newWord)) {
+			updateStats();
+			clearWord();
+		}
 	}
 
 	private void onYes(ActionEvent e) {
@@ -381,8 +382,7 @@ public class FrameMain extends JFrame {
 			JOptionPane.showMessageDialog(this, "Title is empty", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-		boolean isUpdated = manager.updateTitle(title, newTitle);
-		if (isUpdated) {
+		if (manager.updateTitle(title, newTitle)) {
 			jTextTitle.setText(jTextResp.getText());
 		}
 	}

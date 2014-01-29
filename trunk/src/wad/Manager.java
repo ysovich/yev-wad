@@ -173,20 +173,21 @@ public class Manager {
 		}
 	}
 
-	public void addWord(Word word) {
+	public boolean addWord(Word word) {
 		if (word.title == null || word.title.length() == 0) {
 			JOptionPane.showMessageDialog(null, "Missing title");
-			return;
+			return false;
 		}
 		if (word.definition == null || word.definition.length() == 0) {
 			JOptionPane.showMessageDialog(null, "Missing definition");
-			return;
+			return false;
 		}
 		if (wordMap.containsKey(word.title)) {
 			JOptionPane.showMessageDialog(null, "Title already exist");
-			return;
+			return false;
 		}
 		wordMap.put(word.title, word);
+		return true;
 	}
 
 	public void removeWord(String wordTitle) {
