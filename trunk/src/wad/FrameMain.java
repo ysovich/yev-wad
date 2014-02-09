@@ -61,12 +61,62 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 36");
+		setTitle("WAD 37");
 		setSize(new Dimension(700, 630));
+
+		jTextResp.setBounds(new Rectangle(15, 10, 650, 25));
+		jTextResp.setFont(new Font("Tahoma", 0, 16));
+
+		jButtonShow.setText("Show");
+		jButtonShow.setBounds(new Rectangle(460, 40, 80, 25));
+		jButtonShow.setEnabled(false);
+		jButtonShow.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onShow(e);
+			}
+		});
+		jRadioYes.setText("Yes");
+		jRadioYes.setBounds(new Rectangle(550, 45, 50, 15));
+		jRadioYes.setEnabled(false);
+		jRadioYes.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onYes(e);
+			}
+		});
+		jRadioNo.setText("No");
+		jRadioNo.setBounds(new Rectangle(600, 45, 40, 15));
+		jRadioNo.setEnabled(false);
+		jRadioNo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onNo(e);
+			}
+		});
+
 		jLabelTitle.setText("Title");
-		jLabelTitle.setBounds(new Rectangle(15, 55, 130, 15));
-		jTextTitle.setBounds(new Rectangle(15, 75, 460, 25));
+		jLabelTitle.setBounds(new Rectangle(15, 50, 130, 15));
+		jTextTitle.setBounds(new Rectangle(15, 70, 650, 25));
 		jTextTitle.setFont(new Font("Tahoma", 0, 16));
+
+		jButtonNext.setText("Next");
+		jButtonNext.setBounds(new Rectangle(460, 100, 80, 25));
+		jButtonNext.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onNext(e);
+			}
+		});
+		jTextOld.setText("0");
+		jTextOld.setBounds(new Rectangle(550, 100, 25, 25));
+		jLabelOld.setText("Old");
+		jLabelOld.setBounds(new Rectangle(575, 100, 25, 25));
+		jTextNew.setText("0");
+		jTextNew.setBounds(new Rectangle(600, 100, 25, 25));
+		jLabelNew.setText("New");
+		jLabelNew.setBounds(new Rectangle(625, 100, 25, 25));
+
 		jLabelDef.setText("Definition");
 		jLabelDef.setBounds(new Rectangle(15, 110, 200, 15));
 		jTextDef.setBounds(new Rectangle(15, 130, 500, 175));
@@ -79,41 +129,7 @@ public class FrameMain extends JFrame {
 		jTextExample.setLineWrap(true);
 		jTextExample.setWrapStyleWord(true);
 		jTextExample.setFont(new Font("Tahoma", 0, 16));
-		jButtonShow.setText("Show");
-		jButtonShow.setBounds(new Rectangle(485, 25, 80, 25));
-		jButtonShow.setEnabled(false);
-		jButtonShow.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onShow(e);
-			}
-		});
-		jButtonNext.setText("Next");
-		jButtonNext.setBounds(new Rectangle(485, 75, 80, 25));
-		jButtonNext.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onNext(e);
-			}
-		});
-		jRadioYes.setText("Yes");
-		jRadioYes.setBounds(new Rectangle(575, 30, 50, 15));
-		jRadioYes.setEnabled(false);
-		jRadioYes.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onYes(e);
-			}
-		});
-		jRadioNo.setText("No");
-		jRadioNo.setBounds(new Rectangle(625, 30, 40, 15));
-		jRadioNo.setEnabled(false);
-		jRadioNo.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onNo(e);
-			}
-		});
+
 		jButtonAdd.setText("Add");
 		jButtonAdd.setBounds(new Rectangle(320, 550, 75, 25));
 		jButtonAdd.addActionListener(new ActionListener() {
@@ -122,8 +138,6 @@ public class FrameMain extends JFrame {
 				onAdd(e);
 			}
 		});
-		jTextResp.setBounds(new Rectangle(15, 25, 460, 25));
-		jTextResp.setFont(new Font("Tahoma", 0, 16));
 		jLabelStats.setText("");
 		jLabelStats.setBounds(new Rectangle(15, 555, 305, 15));
 		jButtonClear.setText("Clear");
@@ -134,14 +148,7 @@ public class FrameMain extends JFrame {
 				onClear(e);
 			}
 		});
-		jTextOld.setText("0");
-		jTextOld.setBounds(new Rectangle(575, 75, 25, 25));
-		jLabelOld.setText("Old");
-		jLabelOld.setBounds(new Rectangle(600, 75, 25, 25));
-		jTextNew.setText("0");
-		jTextNew.setBounds(new Rectangle(625, 75, 25, 25));
-		jLabelNew.setText("New");
-		jLabelNew.setBounds(new Rectangle(650, 75, 25, 25));
+
 		jButtonMine.setText("Mine");
 		jButtonMine.setBounds(new Rectangle(590, 550, 75, 25));
 		jButtonMine.addActionListener(new ActionListener() {
@@ -195,9 +202,8 @@ public class FrameMain extends JFrame {
 			public void windowClosing(WindowEvent evt) {
 				try {
 					if (manager.getDataHashCode() == dataHashCode) {
-						int confirm =
-								JOptionPane.showConfirmDialog(FrameMain.this, "No change, save anyway?", "Save",
-										JOptionPane.YES_NO_OPTION);
+						int confirm = JOptionPane.showConfirmDialog(FrameMain.this, "No change, save anyway?",
+								"Save", JOptionPane.YES_NO_OPTION);
 						if (JOptionPane.YES_OPTION == confirm) {
 							manager.save();
 						}
@@ -350,9 +356,8 @@ public class FrameMain extends JFrame {
 
 	private void onEdit(ActionEvent e) {
 		Object[] options = { "Find", "Change Title", "Update" };
-		int choice =
-				JOptionPane.showOptionDialog(this, "Choose edit operation", "Edit",
-						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+		int choice = JOptionPane.showOptionDialog(this, "Choose edit operation", "Edit",
+				JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 		if (0 == choice) {
 			onFind();
 		}
