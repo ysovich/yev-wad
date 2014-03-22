@@ -61,7 +61,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 37");
+		setTitle("WAD 38");
 		setSize(new Dimension(700, 630));
 
 		jTextResp.setBounds(new Rectangle(15, 10, 650, 25));

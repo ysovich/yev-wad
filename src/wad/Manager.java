@@ -18,6 +18,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Random;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
@@ -45,6 +48,7 @@ public class Manager {
 	private static final long YEAR = 365 * DAY;
 	private static final long interval[] = { 28 * DAY, 7 * DAY, 3 * DAY, DAY, HOUR, MINUTE, 0 };
 	public static final String intervalLbl[] = { "Y", "M", "W", "T", "D", "H", "M" };
+	public static final String WAD_FILE = "wad.xml";
 	private String WORDS_PATH;
 	private String DICT_PATH;
 	private String DICT_DOWN_PATH;
@@ -461,13 +465,17 @@ public class Manager {
 
 	private void saveXml(Document xmlDoc, String path) {
 		FileOutputStream ostr = null;
+		ZipOutputStream zout = null;
 		try {
 			ostr = new FileOutputStream(path);
+			zout = new ZipOutputStream(ostr);
+			ZipEntry entry = new ZipEntry(WAD_FILE);
+			zout.putNextEntry(entry);
 			DOMSource domSrc = new DOMSource(xmlDoc);
 			TransformerFactory tFactory = TransformerFactory.newInstance();
 			Transformer transformer = tFactory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			transformer.transform(domSrc, new StreamResult(ostr));
+			transformer.transform(domSrc, new StreamResult(zout));
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
@@ -477,6 +485,9 @@ public class Manager {
 		}
 		finally {
 			try {
+				if (zout != null) {
+					zout.close();
+				}
 				if (ostr != null) {
 					ostr.close();
 				}
@@ -489,12 +500,15 @@ public class Manager {
 
 	private Document loadXml(String path) {
 		FileInputStream istr = null;
+		ZipInputStream zin = null;
 		try {
 			istr = new FileInputStream(path);
+			zin = new ZipInputStream(istr);
+			zin.getNextEntry();
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			docFactory.setNamespaceAware(true);
 			DocumentBuilder builder = docFactory.newDocumentBuilder();
-			Document xmlDoc = builder.parse(new InputSource(istr));
+			Document xmlDoc = builder.parse(new InputSource(zin));
 			return xmlDoc;
 		}
 		catch (ParserConfigurationException e) {
@@ -508,6 +522,9 @@ public class Manager {
 		}
 		finally {
 			try {
+				if (zin != null) {
+					zin.close();
+				}
 				if (istr != null) {
 					istr.close();
 				}
