@@ -372,7 +372,7 @@ public class Manager {
 			selectedWords.append("togo " + dict.size());
 			selectedWords.append("\n\n");
 
-			for (int i = 0; i < 10; ++i) {
+			for (int i = 0; i < 10 && !dict.isEmpty(); ++i) {
 				String[] dictArray = dict.toArray(new String[0]);
 
 				Random rnd = new Random();
@@ -382,10 +382,10 @@ public class Manager {
 				selectedWords.append(cand);
 				selectedWords.append('\n');
 
-				PrintWriter outDoun = new PrintWriter(new FileWriter(DICT_DOWN_PATH, true));
-				outDoun.println(cand);
+				PrintWriter outDown = new PrintWriter(new FileWriter(DICT_DOWN_PATH, true));
+				outDown.println(cand);
 				dict.remove(cand);
-				outDoun.close();
+				outDown.close();
 			}
 		}
 		catch (IOException e) {
