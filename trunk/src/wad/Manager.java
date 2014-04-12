@@ -11,6 +11,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,6 +61,7 @@ public class Manager {
 	private int newCount;
 	private LinkedList<String> lastAttempts = new LinkedList<String>();
 	private int candCount;
+	private boolean selectOldest = true;
 
 	public Manager(String configPath) {
 		lastAttempts.push("");
@@ -253,21 +256,46 @@ public class Manager {
 
 		prepareCandidateList(candList, doneList);
 
-		Word selWord = null;
-		Random rnd = new Random();
-		if (!candList.isEmpty()) {
-			for (String lastAttempt : lastAttempts) {
-				if (candList.size() > 1) {
-					Word word = wordMap.get(lastAttempt);
-					if (word != null) {
-						candList.remove(word);
-					}
+		// exclude the last tree attempted words
+		for (String lastAttempt : lastAttempts) {
+			if (candList.size() > 1) {
+				Word word = wordMap.get(lastAttempt);
+				if (word != null) {
+					candList.remove(word);
 				}
 			}
-			selWord = candList.get(rnd.nextInt(candList.size()));
 		}
+
+		Word selWord = null;
+		if (!candList.isEmpty()) {
+			if (selectOldest) {
+				// select the word that has the earliest last attempt
+				selWord = Collections.min(candList, new Comparator<Word>() {
+					@Override
+					public int compare(Word o1, Word o2) {
+						if (o1.attemptList.isEmpty() && o2.attemptList.isEmpty()) {
+							return 0;
+						}
+						if (o1.attemptList.isEmpty()) {
+							return -1;
+						}
+						if (o2.attemptList.isEmpty()) {
+							return 1;
+						}
+						return Collections.max(o1.attemptList).compareTo(Collections.max(o2.attemptList));
+					}
+				});
+			}
+			else {
+				// select the word randomly
+				selWord = candList.get(new Random().nextInt(candList.size()));
+			}
+			// alternate the selection method
+			selectOldest = !selectOldest;
+		}
+
 		if (oldCount > 0 && selWord == null && !doneList.isEmpty()) {
-			selWord = doneList.get(rnd.nextInt(doneList.size()));
+			selWord = doneList.get(new Random().nextInt(doneList.size()));
 			--oldCount;
 		}
 
@@ -276,7 +304,7 @@ public class Manager {
 
 	private void prepareCandidateList(ArrayList<Word> candList, ArrayList<Word> doneList) {
 		stats = new int[interval.length];
-		
+
 		for (Word word : wordMap.values()) {
 			if (word.isNew) {
 				continue;
