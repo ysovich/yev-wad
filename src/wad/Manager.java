@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Random;
+import java.util.TreeMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -561,6 +562,25 @@ public class Manager {
 				new RuntimeException(e);
 			}
 		}
+	}
+
+	public TreeMap<Integer, Integer> getCountByDay() {
+		TreeMap<Integer, Integer> countByDay = new TreeMap<Integer, Integer>();
+		Date now = new Date();
+		for (Word word : wordMap.values()) {
+			Integer day = 0;
+			if (!word.attemptList.isEmpty()) {
+				Date firstAttempt = Collections.min(word.attemptList);
+				day = (int) Math.round(((double) calcDurationDays(now, firstAttempt)) / DAY);
+			}
+			Integer count = countByDay.get(day);
+			if (count == null) {
+				count = 0;
+			}
+			count = count + 1;
+			countByDay.put(day, count);
+		}
+		return countByDay;
 	}
 
 }

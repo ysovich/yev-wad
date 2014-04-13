@@ -10,12 +10,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
@@ -44,6 +47,7 @@ public class FrameMain extends JFrame {
 	private final JLabel jLabelNew = new JLabel();
 	private final JButton jButtonMine = new JButton("Mine");
 	private final JTextArea jTextMine = new JTextArea();
+	private final JScrollPane jScrollMine = new JScrollPane(jTextMine);
 	private final JButton jButtonEdit = new JButton("Edit");
 
 	public FrameMain(String configPath) {
@@ -61,7 +65,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 40");
+		setTitle("WAD 41");
 		setSize(new Dimension(700, 630));
 
 		jTextResp.setBounds(new Rectangle(15, 10, 650, 25));
@@ -157,7 +161,7 @@ public class FrameMain extends JFrame {
 				onMine(e);
 			}
 		});
-		jTextMine.setBounds(new Rectangle(545, 130, 120, 410));
+		jScrollMine.setBounds(new Rectangle(545, 130, 120, 410));
 		jTextMine.setFont(new Font("Tahoma", 0, 16));
 		jTextMine.setLineWrap(true);
 		jButtonEdit.setText("Edit");
@@ -188,7 +192,7 @@ public class FrameMain extends JFrame {
 		cont.add(jTextTitle, null);
 		cont.add(jLabelTitle, null);
 		cont.add(jButtonMine, null);
-		cont.add(jTextMine, null);
+		cont.add(jScrollMine, null);
 		cont.add(jButtonEdit, null);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		class ClosingListener extends WindowAdapter {
@@ -223,6 +227,7 @@ public class FrameMain extends JFrame {
 		ClosingListener closingListener = new ClosingListener(manager.getDataHashCode());
 		addWindowListener(closingListener);
 		updateStats();
+		showCountByDay();
 	}
 
 	private void onShow(ActionEvent e) {
@@ -397,6 +402,18 @@ public class FrameMain extends JFrame {
 			word.definition = jTextDef.getText();
 			word.example = jTextExample.getText();
 		}
+	}
+
+	private void showCountByDay() {
+		TreeMap<Integer, Integer> countByDay = manager.getCountByDay();
+		StringBuilder sb = new StringBuilder();
+		for (Map.Entry<Integer, Integer> entry : countByDay.descendingMap().entrySet()) {
+			sb.append(entry.getKey());
+			sb.append(" : ");
+			sb.append(entry.getValue());
+			sb.append('\n');
+		}
+		jTextMine.setText(sb.toString());
 	}
 
 }
