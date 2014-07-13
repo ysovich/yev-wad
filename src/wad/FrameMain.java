@@ -65,11 +65,11 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 42");
-		setSize(new Dimension(700, 630));
+		setTitle("WAD 43");
+		setSize(new Dimension(700, 620));
 		setResizable(false);
 
-		jTextResp.setBounds(new Rectangle(15, 10, 650, 25));
+		jTextResp.setBounds(new Rectangle(15, 10, 665, 25));
 		jTextResp.setFont(new Font("Tahoma", 0, 16));
 
 		jButtonShow.setText("Show");
@@ -102,7 +102,7 @@ public class FrameMain extends JFrame {
 
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(15, 50, 130, 15));
-		jTextTitle.setBounds(new Rectangle(15, 70, 650, 25));
+		jTextTitle.setBounds(new Rectangle(15, 70, 665, 25));
 		jTextTitle.setFont(new Font("Tahoma", 0, 16));
 
 		jButtonNext.setText("Next");
@@ -124,19 +124,19 @@ public class FrameMain extends JFrame {
 
 		jLabelDef.setText("Definition");
 		jLabelDef.setBounds(new Rectangle(15, 110, 200, 15));
-		jTextDef.setBounds(new Rectangle(15, 130, 500, 175));
+		jTextDef.setBounds(new Rectangle(15, 130, 515, 175));
 		jTextDef.setLineWrap(true);
 		jTextDef.setWrapStyleWord(true);
 		jTextDef.setFont(new Font("Tahoma", 0, 16));
 		jLabelExample.setText("Example");
 		jLabelExample.setBounds(new Rectangle(15, 315, 200, 15));
-		jTextExample.setBounds(new Rectangle(15, 335, 500, 205));
+		jTextExample.setBounds(new Rectangle(15, 335, 515, 205));
 		jTextExample.setLineWrap(true);
 		jTextExample.setWrapStyleWord(true);
 		jTextExample.setFont(new Font("Tahoma", 0, 16));
 
 		jButtonAdd.setText("Add");
-		jButtonAdd.setBounds(new Rectangle(320, 550, 75, 25));
+		jButtonAdd.setBounds(new Rectangle(335, 550, 75, 25));
 		jButtonAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -144,9 +144,9 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jLabelStats.setText("");
-		jLabelStats.setBounds(new Rectangle(15, 555, 305, 15));
+		jLabelStats.setBounds(new Rectangle(5, 555, 330, 15));
 		jButtonClear.setText("Clear");
-		jButtonClear.setBounds(new Rectangle(500, 550, 75, 25));
+		jButtonClear.setBounds(new Rectangle(515, 550, 75, 25));
 		jButtonClear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -155,18 +155,18 @@ public class FrameMain extends JFrame {
 		});
 
 		jButtonMine.setText("Mine");
-		jButtonMine.setBounds(new Rectangle(590, 550, 75, 25));
+		jButtonMine.setBounds(new Rectangle(605, 550, 75, 25));
 		jButtonMine.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				onMine(e);
 			}
 		});
-		jScrollMine.setBounds(new Rectangle(545, 130, 120, 410));
+		jScrollMine.setBounds(new Rectangle(545, 130, 135, 410));
 		jTextMine.setFont(new Font("Tahoma", 0, 16));
 		jTextMine.setLineWrap(true);
 		jButtonEdit.setText("Edit");
-		jButtonEdit.setBounds(new Rectangle(410, 550, 75, 25));
+		jButtonEdit.setBounds(new Rectangle(425, 550, 75, 25));
 		jButtonEdit.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
