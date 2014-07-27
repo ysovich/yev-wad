@@ -37,6 +37,7 @@ public class FrameMain extends JFrame {
 	private final JButton jButtonNext = new JButton("Next");
 	private final JRadioButton jRadioYes = new JRadioButton("Yes");
 	private final JRadioButton jRadioNo = new JRadioButton("No");
+	private final JButton jButtonUndo = new JButton("Undo");
 	private final JButton jButtonAdd = new JButton("Add");
 	private final JTextField jTextResp = new JTextField();
 	private final JLabel jLabelStats = new JLabel();
@@ -65,7 +66,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 43");
+		setTitle("WAD 44");
 		setSize(new Dimension(700, 620));
 		setResizable(false);
 
@@ -73,7 +74,7 @@ public class FrameMain extends JFrame {
 		jTextResp.setFont(new Font("Tahoma", 0, 16));
 
 		jButtonShow.setText("Show");
-		jButtonShow.setBounds(new Rectangle(460, 40, 80, 25));
+		jButtonShow.setBounds(new Rectangle(420, 40, 80, 25));
 		jButtonShow.setEnabled(false);
 		jButtonShow.addActionListener(new ActionListener() {
 			@Override
@@ -82,7 +83,7 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jRadioYes.setText("Yes");
-		jRadioYes.setBounds(new Rectangle(550, 45, 50, 15));
+		jRadioYes.setBounds(new Rectangle(510, 45, 50, 15));
 		jRadioYes.setEnabled(false);
 		jRadioYes.addActionListener(new ActionListener() {
 			@Override
@@ -91,12 +92,20 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jRadioNo.setText("No");
-		jRadioNo.setBounds(new Rectangle(600, 45, 40, 15));
+		jRadioNo.setBounds(new Rectangle(560, 45, 40, 15));
 		jRadioNo.setEnabled(false);
 		jRadioNo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				onNo(e);
+			}
+		});
+		jButtonUndo.setText("Undo");
+		jButtonUndo.setBounds(new Rectangle(610, 40, 69, 25));
+		jButtonUndo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onUndo(e);
 			}
 		});
 
@@ -184,6 +193,7 @@ public class FrameMain extends JFrame {
 		cont.add(jButtonAdd, null);
 		cont.add(jRadioNo, null);
 		cont.add(jRadioYes, null);
+		cont.add(jButtonUndo, null);
 		cont.add(jButtonNext, null);
 		cont.add(jButtonShow, null);
 		cont.add(jTextExample, null);
@@ -340,6 +350,15 @@ public class FrameMain extends JFrame {
 		jButtonNext.requestFocusInWindow();
 	}
 
+	private void onUndo(ActionEvent e) {
+		if (word != null) {
+			if (manager.undoAttempt(word.title)) {
+				jRadioYes.setSelected(false);
+				jRadioNo.setSelected(false);
+			}
+		}
+	}
+	
 	private void onClear(ActionEvent e) {
 		clearWord();
 		jTextMine.setText("");
