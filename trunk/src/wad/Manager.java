@@ -63,6 +63,8 @@ public class Manager {
 	private LinkedList<String> lastAttempts = new LinkedList<String>();
 	private int candCount;
 	private boolean selectOldest = true;
+	private ArrayList<Date> undoAttemptList;
+	private String undoWordTitle;
 
 	public Manager(String configPath) {
 		lastAttempts.push("");
@@ -220,11 +222,15 @@ public class Manager {
 			wordMap.remove(wordTitle);
 			graduatedWord = word;
 		}
-		else if (isCorrect) {
-			word.attemptList.add(attemptDate);
-		}
 		else {
-			word.attemptList.clear();
+			undoAttemptList = (ArrayList<Date>) word.attemptList.clone();
+			undoWordTitle = word.title;
+			if (isCorrect) {
+				word.attemptList.add(attemptDate);
+			}
+			else {
+				word.attemptList.clear();
+			}
 		}
 		lastAttempts.addFirst(wordTitle);
 		lastAttempts.pollLast();
@@ -562,6 +568,20 @@ public class Manager {
 				new RuntimeException(e);
 			}
 		}
+	}
+
+	public boolean undoAttempt(String wordTitle) {
+		boolean undid = false;
+		if (undoAttemptList != null && undoWordTitle != null && undoWordTitle.equals(wordTitle)) {
+			Word word = wordMap.get(wordTitle);
+			if (word != null) {
+				word.attemptList = undoAttemptList;
+				undid = true;
+			}
+		}
+		undoAttemptList = null;
+		undoWordTitle = null;
+		return undid;
 	}
 
 	public TreeMap<Integer, Integer> getCountByDay() {
