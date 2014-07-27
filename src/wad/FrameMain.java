@@ -46,6 +46,7 @@ public class FrameMain extends JFrame {
 	private final JLabel jLabelOld = new JLabel();
 	private final JTextField jTextNew = new JTextField("0");
 	private final JLabel jLabelNew = new JLabel();
+	private final JButton jButtonReview = new JButton("Review");
 	private final JButton jButtonMine = new JButton("Mine");
 	private final JTextArea jTextMine = new JTextArea();
 	private final JScrollPane jScrollMine = new JScrollPane(jTextMine);
@@ -66,7 +67,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 44");
+		setTitle("WAD 45");
 		setSize(new Dimension(700, 620));
 		setResizable(false);
 
@@ -115,7 +116,7 @@ public class FrameMain extends JFrame {
 		jTextTitle.setFont(new Font("Tahoma", 0, 16));
 
 		jButtonNext.setText("Next");
-		jButtonNext.setBounds(new Rectangle(460, 100, 80, 25));
+		jButtonNext.setBounds(new Rectangle(420, 100, 80, 25));
 		jButtonNext.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -123,13 +124,21 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jTextOld.setText("0");
-		jTextOld.setBounds(new Rectangle(550, 100, 25, 25));
+		jTextOld.setBounds(new Rectangle(510, 100, 25, 25));
 		jLabelOld.setText("Old");
-		jLabelOld.setBounds(new Rectangle(575, 100, 25, 25));
+		jLabelOld.setBounds(new Rectangle(535, 100, 25, 25));
 		jTextNew.setText("0");
-		jTextNew.setBounds(new Rectangle(600, 100, 25, 25));
+		jTextNew.setBounds(new Rectangle(560, 100, 25, 25));
 		jLabelNew.setText("New");
-		jLabelNew.setBounds(new Rectangle(625, 100, 25, 25));
+		jLabelNew.setBounds(new Rectangle(585, 100, 25, 25));
+		jButtonReview.setText("Rev");
+		jButtonReview.setBounds(new Rectangle(620, 100, 59, 25));
+		jButtonReview.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onReview(e);
+			}
+		});
 
 		jLabelDef.setText("Definition");
 		jLabelDef.setBounds(new Rectangle(15, 110, 200, 15));
@@ -185,6 +194,7 @@ public class FrameMain extends JFrame {
 
 		cont.add(jLabelNew, null);
 		cont.add(jTextNew, null);
+		cont.add(jButtonReview, null);
 		cont.add(jLabelOld, null);
 		cont.add(jTextOld, null);
 		cont.add(jButtonClear, null);
@@ -358,7 +368,11 @@ public class FrameMain extends JFrame {
 			}
 		}
 	}
-	
+
+	private void onReview(ActionEvent e) {
+		manager.prepareReviewList();
+	}
+
 	private void onClear(ActionEvent e) {
 		clearWord();
 		jTextMine.setText("");

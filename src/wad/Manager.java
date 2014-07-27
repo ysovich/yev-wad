@@ -65,6 +65,7 @@ public class Manager {
 	private boolean selectOldest = true;
 	private ArrayList<Date> undoAttemptList;
 	private String undoWordTitle;
+	private ArrayList<Word> reviewList = new ArrayList<Word>();
 
 	public Manager(String configPath) {
 		lastAttempts.push("");
@@ -306,6 +307,12 @@ public class Manager {
 			--oldCount;
 		}
 
+		if (selWord == null && !reviewList.isEmpty()) {
+			int selIndex = new Random().nextInt(reviewList.size());
+			selWord = reviewList.get(selIndex);
+			reviewList.remove(selIndex);
+		}
+
 		return selWord;
 	}
 
@@ -375,6 +382,38 @@ public class Manager {
 		}
 
 		candCount = candList.size();
+	}
+
+	public void prepareReviewList() {
+		reviewList = new ArrayList<Word>();
+		for (Word word : wordMap.values()) {
+			if (word.isNew) {
+				continue;
+			}
+			long dur = 0;
+			Date now = new Date();
+			Date lastDate = now;
+			if (word.attemptList.size() > 1) {
+				Date prevDate = word.attemptList.get(0);
+				for (int i = 1; i < word.attemptList.size(); ++i) {
+					Date curDate = word.attemptList.get(i);
+					long curDur = calcDurationDays(curDate, prevDate);
+					if (curDur == 0) {
+						curDur = curDate.getTime() - prevDate.getTime();
+					}
+					if (curDur > dur) {
+						dur = curDur;
+					}
+					lastDate = curDate;
+					prevDate = curDate;
+				}
+			}
+			if (dur > 0) {
+				if (dur > HOUR && dur < DAY) {
+					reviewList.add(word);
+				}
+			}
+		}
 	}
 
 	public String mine() {
