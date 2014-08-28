@@ -66,6 +66,7 @@ public class Manager {
 	private ArrayList<Date> undoAttemptList;
 	private String undoWordTitle;
 	private ArrayList<Word> reviewList = new ArrayList<Word>();
+	private int graduatedCount;
 
 	public Manager(String configPath) {
 		lastAttempts.push("");
@@ -101,6 +102,10 @@ public class Manager {
 		return candCount;
 	}
 
+	public int getGraduatedCount() {
+		return graduatedCount;
+	}
+
 	public int getDataHashCode() {
 		return wordMap.hashCode();
 	}
@@ -109,6 +114,12 @@ public class Manager {
 		wordMap = new LinkedHashMap<String, Word>();
 		Document xmlDoc = loadXml(WORDS_PATH);
 		Element rootEl = xmlDoc.getDocumentElement();
+		try {
+			graduatedCount = Integer.parseInt(rootEl.getAttribute("g"));
+		}
+		catch (NumberFormatException e1) {
+			graduatedCount = 0;
+		}
 		NodeList rootChildList = rootEl.getChildNodes();
 		int len = rootChildList.getLength();
 		for (int i = 0; i < len; ++i) {
@@ -155,6 +166,7 @@ public class Manager {
 			Document xmlDoc = builder.newDocument();
 			Element wadEl = xmlDoc.createElement("wad");
 			xmlDoc.appendChild(wadEl);
+			wadEl.setAttribute("g", Integer.toString(graduatedCount));
 
 			for (Word word : wordMap.values()) {
 				Element wordEl = xmlDoc.createElement("w");
@@ -222,6 +234,7 @@ public class Manager {
 		if (graduated) {
 			wordMap.remove(wordTitle);
 			graduatedWord = word;
+			++graduatedCount;
 		}
 		else {
 			undoAttemptList = (ArrayList<Date>) word.attemptList.clone();

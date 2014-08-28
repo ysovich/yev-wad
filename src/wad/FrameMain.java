@@ -41,6 +41,7 @@ public class FrameMain extends JFrame {
 	private final JButton jButtonAdd = new JButton("Add");
 	private final JTextField jTextResp = new JTextField();
 	private final JLabel jLabelStats = new JLabel();
+	private final JLabel jLabelStats2 = new JLabel();
 	private final JButton jButtonClear = new JButton("Clear");
 	private final JTextField jTextOld = new JTextField("0");
 	private final JLabel jLabelOld = new JLabel();
@@ -67,7 +68,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 45");
+		setTitle("WAD 46");
 		setSize(new Dimension(700, 620));
 		setResizable(false);
 
@@ -162,7 +163,10 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jLabelStats.setText("");
-		jLabelStats.setBounds(new Rectangle(5, 555, 330, 15));
+		jLabelStats.setBounds(new Rectangle(15, 548, 330, 15));
+		jLabelStats.setFont(new Font("Verdana", Font.BOLD, 16));
+		jLabelStats2.setText("");
+		jLabelStats2.setBounds(new Rectangle(15, 568, 330, 15));
 		jButtonClear.setText("Clear");
 		jButtonClear.setBounds(new Rectangle(515, 550, 75, 25));
 		jButtonClear.addActionListener(new ActionListener() {
@@ -199,6 +203,7 @@ public class FrameMain extends JFrame {
 		cont.add(jTextOld, null);
 		cont.add(jButtonClear, null);
 		cont.add(jLabelStats, null);
+		cont.add(jLabelStats2, null);
 		cont.add(jTextResp, null);
 		cont.add(jButtonAdd, null);
 		cont.add(jRadioNo, null);
@@ -309,22 +314,33 @@ public class FrameMain extends JFrame {
 	private void updateStats() {
 		int[] stats = manager.getStats();
 		StringBuilder statsStr = new StringBuilder();
+		StringBuilder statsStr2 = new StringBuilder();
+		statsStr2.append("G:" + manager.getGraduatedCount() + " ");
 		int total = 0;
 		for (int i = 0; i < stats.length; ++i) {
 			long count = stats[i];
 			total += count;
-			statsStr.append(Manager.intervalLbl[i]);
-			statsStr.append(":");
-			statsStr.append(count);
-			statsStr.append(" ");
+			if (i > 3) {
+				statsStr.append(Manager.intervalLbl[i]);
+				statsStr.append(":");
+				statsStr.append(count);
+				statsStr.append(" ");
+			}
+			else {
+				statsStr2.append(Manager.intervalLbl[i]);
+				statsStr2.append(":");
+				statsStr2.append(count);
+				statsStr2.append(" ");
+			}
 		}
-		statsStr.append(total);
-		statsStr.append("(");
-		statsStr.append(manager.getRemainingNewCount());
-		statsStr.append(")");
-		statsStr.append(" C:");
+		statsStr2.append(total);
+		statsStr2.append("(");
+		statsStr2.append(manager.getRemainingNewCount());
+		statsStr2.append(")");
+		statsStr.append("C:");
 		statsStr.append(manager.getCandCount());
 		jLabelStats.setText(statsStr.toString());
+		jLabelStats2.setText(statsStr2.toString());
 	}
 
 	private void onAdd(ActionEvent e) {
