@@ -222,13 +222,7 @@ public class Manager {
 		Word word = wordMap.get(wordTitle);
 		boolean graduated = false;
 		if (isCorrect) {
-			Date now = new Date();
-			for (Date prevAttemptDate : word.attemptList) {
-				if (calcDurationDays(now, prevAttemptDate) > YEAR) {
-					graduated = true;
-					break;
-				}
-			}
+			graduated = isGraduation(word);
 		}
 
 		if (graduated) {
@@ -237,7 +231,7 @@ public class Manager {
 			++graduatedCount;
 		}
 		else {
-			undoAttemptList = (ArrayList<Date>) word.attemptList.clone();
+			undoAttemptList = new ArrayList<Date>(word.attemptList);
 			undoWordTitle = word.title;
 			if (isCorrect) {
 				word.attemptList.add(attemptDate);
@@ -249,6 +243,16 @@ public class Manager {
 		lastAttempts.addFirst(wordTitle);
 		lastAttempts.pollLast();
 		return graduatedWord;
+	}
+
+	public boolean isGraduation(Word word) {
+		Date now = new Date();
+		for (Date prevAttemptDate : word.attemptList) {
+			if (calcDurationDays(now, prevAttemptDate) > YEAR) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
