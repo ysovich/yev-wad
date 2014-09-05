@@ -68,12 +68,18 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 47");
+		setTitle("WAD 48");
 		setSize(new Dimension(700, 620));
 		setResizable(false);
 
 		jTextResp.setBounds(new Rectangle(15, 10, 665, 25));
 		jTextResp.setFont(new Font("Tahoma", 0, 16));
+		jTextResp.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onShow(e);
+			}
+		});
 
 		jButtonShow.setText("Show");
 		jButtonShow.setBounds(new Rectangle(420, 40, 80, 25));
@@ -258,6 +264,9 @@ public class FrameMain extends JFrame {
 	}
 
 	private void onShow(ActionEvent e) {
+		if (word == null) {
+			return;
+		}
 		jTextTitle.setText(word.title);
 		jTextExample.setText(word.example);
 		String title = word.title.split("\\d")[0];
