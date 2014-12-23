@@ -68,7 +68,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 48");
+		setTitle("WAD 49");
 		setSize(new Dimension(700, 620));
 		setResizable(false);
 
@@ -83,7 +83,6 @@ public class FrameMain extends JFrame {
 
 		jButtonShow.setText("Show");
 		jButtonShow.setBounds(new Rectangle(420, 40, 80, 25));
-		jButtonShow.setEnabled(false);
 		jButtonShow.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -92,7 +91,6 @@ public class FrameMain extends JFrame {
 		});
 		jRadioYes.setText("Yes");
 		jRadioYes.setBounds(new Rectangle(510, 45, 50, 15));
-		jRadioYes.setEnabled(false);
 		jRadioYes.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -101,7 +99,6 @@ public class FrameMain extends JFrame {
 		});
 		jRadioNo.setText("No");
 		jRadioNo.setBounds(new Rectangle(560, 45, 40, 15));
-		jRadioNo.setEnabled(false);
 		jRadioNo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -307,15 +304,9 @@ public class FrameMain extends JFrame {
 		jTextResp.setForeground(Color.black);
 		if (word == null) {
 			jTextDef.setText("");
-			jRadioYes.setEnabled(false);
-			jRadioNo.setEnabled(false);
-			jButtonShow.setEnabled(false);
 		}
 		else {
 			jTextDef.setText((manager.isGraduation(word) ? "***GRADUATION***\n" : "") + word.definition);
-			jRadioYes.setEnabled(true);
-			jRadioNo.setEnabled(true);
-			jButtonShow.setEnabled(true);
 		}
 		updateStats();
 		jTextResp.requestFocusInWindow();
@@ -355,7 +346,7 @@ public class FrameMain extends JFrame {
 
 	private void onAdd(ActionEvent e) {
 		Word newWord = new Word();
-		newWord.title = jTextTitle.getText();
+		newWord.title = jTextTitle.getText().trim();
 		newWord.definition = jTextDef.getText();
 		newWord.example = jTextExample.getText();
 		newWord.isNew = true;
@@ -366,6 +357,9 @@ public class FrameMain extends JFrame {
 	}
 
 	private void onYes(ActionEvent e) {
+		if (word == null) {
+			return;
+		}
 		Word graduatedWord = manager.addAttempt(word.title, new Date(), true);
 		if (graduatedWord != null) {
 			StringBuilder sb = new StringBuilder();
@@ -382,6 +376,9 @@ public class FrameMain extends JFrame {
 	}
 
 	private void onNo(ActionEvent e) {
+		if (word == null) {
+			return;
+		}
 		manager.addAttempt(word.title, new Date(), false);
 		jButtonNext.requestFocusInWindow();
 	}
@@ -412,6 +409,7 @@ public class FrameMain extends JFrame {
 		jRadioYes.setSelected(false);
 		jRadioNo.setSelected(false);
 		jTextResp.setForeground(Color.black);
+		word = null;
 	}
 
 	private void onMine(ActionEvent e) {
