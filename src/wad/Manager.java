@@ -67,6 +67,7 @@ public class Manager {
 	private String undoWordTitle;
 	private ArrayList<Word> reviewList = new ArrayList<Word>();
 	private int graduatedCount;
+	private int savedHashCode;
 
 	public Manager(String configPath) {
 		lastAttempts.push("");
@@ -108,6 +109,10 @@ public class Manager {
 
 	public int getDataHashCode() {
 		return wordMap.hashCode();
+	}
+
+	public int getSavedHashCode() {
+		return savedHashCode;
 	}
 
 	public void load() {
@@ -156,6 +161,7 @@ public class Manager {
 				}
 			}
 		}
+		savedHashCode = getDataHashCode();
 	}
 
 	public void save() {
@@ -194,6 +200,7 @@ public class Manager {
 		catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		}
+		savedHashCode = getDataHashCode();
 	}
 
 	public boolean addWord(Word word) {

@@ -68,7 +68,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 49");
+		setTitle("WAD 50");
 		setSize(new Dimension(700, 620));
 		setResizable(false);
 
@@ -225,24 +225,11 @@ public class FrameMain extends JFrame {
 		cont.add(jButtonEdit, null);
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		class ClosingListener extends WindowAdapter {
-			private int dataHashCode;
-
-			public ClosingListener(int dataHashCode) {
-				this.dataHashCode = dataHashCode;
-			}
 
 			@Override
 			public void windowClosing(WindowEvent evt) {
 				try {
-					if (manager.getDataHashCode() == dataHashCode) {
-						int confirm =
-								JOptionPane.showConfirmDialog(FrameMain.this, "No change, save anyway?", "Save",
-										JOptionPane.YES_NO_OPTION);
-						if (JOptionPane.YES_OPTION == confirm) {
-							manager.save();
-						}
-					}
-					else {
+					if (manager.getDataHashCode() != manager.getSavedHashCode()) {
 						manager.save();
 					}
 					FrameMain.this.dispose();
@@ -254,7 +241,7 @@ public class FrameMain extends JFrame {
 				}
 			}
 		}
-		ClosingListener closingListener = new ClosingListener(manager.getDataHashCode());
+		ClosingListener closingListener = new ClosingListener();
 		addWindowListener(closingListener);
 		updateStats();
 		showCountByDay();
@@ -418,7 +405,7 @@ public class FrameMain extends JFrame {
 	}
 
 	private void onEdit(ActionEvent e) {
-		Object[] options = { "Find", "Change Title", "Update" };
+		Object[] options = { "Find", "Change Title", "Update", "Save" };
 		int choice =
 				JOptionPane.showOptionDialog(this, "Choose edit operation", "Edit",
 						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
@@ -430,6 +417,9 @@ public class FrameMain extends JFrame {
 		}
 		else if (2 == choice) {
 			onUpdate();
+		}
+		else if (3 == choice) {
+			onSave();
 		}
 	}
 
@@ -473,6 +463,19 @@ public class FrameMain extends JFrame {
 			sb.append('\n');
 		}
 		jTextMine.setText(sb.toString());
+	}
+
+	private void onSave() {
+		try {
+			if (manager.getDataHashCode() != manager.getSavedHashCode()) {
+				manager.save();
+			}
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(FrameMain.this, ex.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 }
