@@ -51,7 +51,10 @@ public class FrameMain extends JFrame {
 	private final JButton jButtonMine = new JButton("Mine");
 	private final JTextArea jTextMine = new JTextArea();
 	private final JScrollPane jScrollMine = new JScrollPane(jTextMine);
-	private final JButton jButtonEdit = new JButton("Edit");
+	private final JButton jButtonFind = new JButton("Find");
+	private final JButton jButtonChange = new JButton("Change");
+	private final JButton jButtonUpdate = new JButton("Update");
+	private final JButton jButtonSave = new JButton("Save");
 
 	public FrameMain(String configPath) {
 		try {
@@ -68,8 +71,8 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 50");
-		setSize(new Dimension(700, 620));
+		setTitle("WAD 51");
+		setSize(new Dimension(700, 650));
 		setResizable(false);
 
 		jTextResp.setBounds(new Rectangle(15, 10, 665, 25));
@@ -158,7 +161,7 @@ public class FrameMain extends JFrame {
 		jTextExample.setFont(new Font("Tahoma", 0, 16));
 
 		jButtonAdd.setText("Add");
-		jButtonAdd.setBounds(new Rectangle(335, 550, 75, 25));
+		jButtonAdd.setBounds(new Rectangle(315, 550, 80, 25));
 		jButtonAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -170,8 +173,9 @@ public class FrameMain extends JFrame {
 		jLabelStats.setFont(new Font("Verdana", Font.BOLD, 16));
 		jLabelStats2.setText("");
 		jLabelStats2.setBounds(new Rectangle(15, 568, 330, 15));
+
 		jButtonClear.setText("Clear");
-		jButtonClear.setBounds(new Rectangle(515, 550, 75, 25));
+		jButtonClear.setBounds(new Rectangle(505, 585, 80, 25));
 		jButtonClear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -180,7 +184,7 @@ public class FrameMain extends JFrame {
 		});
 
 		jButtonMine.setText("Mine");
-		jButtonMine.setBounds(new Rectangle(605, 550, 75, 25));
+		jButtonMine.setBounds(new Rectangle(600, 585, 80, 25));
 		jButtonMine.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -190,12 +194,40 @@ public class FrameMain extends JFrame {
 		jScrollMine.setBounds(new Rectangle(545, 130, 135, 410));
 		jTextMine.setFont(new Font("Tahoma", 0, 16));
 		jTextMine.setLineWrap(true);
-		jButtonEdit.setText("Edit");
-		jButtonEdit.setBounds(new Rectangle(425, 550, 75, 25));
-		jButtonEdit.addActionListener(new ActionListener() {
+
+		jButtonFind.setText("Find");
+		jButtonFind.setBounds(new Rectangle(410, 550, 80, 25));
+		jButtonFind.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				onEdit(e);
+				onFind();
+			}
+		});
+
+		jButtonChange.setText("Change");
+		jButtonChange.setBounds(new Rectangle(505, 550, 80, 25));
+		jButtonChange.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onChangeTitle();
+			}
+		});
+
+		jButtonUpdate.setText("Update");
+		jButtonUpdate.setBounds(new Rectangle(600, 550, 80, 25));
+		jButtonUpdate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onUpdate();
+			}
+		});
+
+		jButtonSave.setText("Save");
+		jButtonSave.setBounds(new Rectangle(410, 585, 80, 25));
+		jButtonSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				onSave();
 			}
 		});
 
@@ -222,7 +254,11 @@ public class FrameMain extends JFrame {
 		cont.add(jLabelTitle, null);
 		cont.add(jButtonMine, null);
 		cont.add(jScrollMine, null);
-		cont.add(jButtonEdit, null);
+		cont.add(jButtonFind, null);
+		cont.add(jButtonChange, null);
+		cont.add(jButtonUpdate, null);
+		cont.add(jButtonSave, null);
+
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		class ClosingListener extends WindowAdapter {
 
@@ -402,25 +438,6 @@ public class FrameMain extends JFrame {
 	private void onMine(ActionEvent e) {
 		String selectedWords = manager.mine();
 		jTextMine.setText(selectedWords);
-	}
-
-	private void onEdit(ActionEvent e) {
-		Object[] options = { "Find", "Change Title", "Update", "Save" };
-		int choice =
-				JOptionPane.showOptionDialog(this, "Choose edit operation", "Edit",
-						JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-		if (0 == choice) {
-			onFind();
-		}
-		else if (1 == choice) {
-			onChangeTitle();
-		}
-		else if (2 == choice) {
-			onUpdate();
-		}
-		else if (3 == choice) {
-			onSave();
-		}
 	}
 
 	private void onFind() {
