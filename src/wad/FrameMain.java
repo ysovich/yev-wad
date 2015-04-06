@@ -71,12 +71,15 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 51");
+		setTitle("WAD 52");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
+		Font fontDialog14 = new Font("Dialog", 1, 14);
+		Font fontTahoma16 = new Font("Tahoma", 0, 16);
+
 		jTextResp.setBounds(new Rectangle(15, 10, 665, 25));
-		jTextResp.setFont(new Font("Tahoma", 0, 16));
+		jTextResp.setFont(fontTahoma16);
 		jTextResp.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -85,7 +88,8 @@ public class FrameMain extends JFrame {
 		});
 
 		jButtonShow.setText("Show");
-		jButtonShow.setBounds(new Rectangle(420, 40, 80, 25));
+		jButtonShow.setBounds(new Rectangle(400, 40, 80, 25));
+		jButtonShow.setFont(fontDialog14);
 		jButtonShow.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -93,7 +97,8 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jRadioYes.setText("Yes");
-		jRadioYes.setBounds(new Rectangle(510, 45, 50, 15));
+		jRadioYes.setBounds(new Rectangle(495, 45, 52, 15));
+		jRadioYes.setFont(fontDialog14);
 		jRadioYes.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -101,7 +106,8 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jRadioNo.setText("No");
-		jRadioNo.setBounds(new Rectangle(560, 45, 40, 15));
+		jRadioNo.setBounds(new Rectangle(550, 45, 45, 15));
+		jRadioNo.setFont(fontDialog14);
 		jRadioNo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -109,7 +115,8 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jButtonUndo.setText("Undo");
-		jButtonUndo.setBounds(new Rectangle(610, 40, 69, 25));
+		jButtonUndo.setBounds(new Rectangle(605, 40, 74, 25));
+		jButtonUndo.setFont(fontDialog14);
 		jButtonUndo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -120,10 +127,11 @@ public class FrameMain extends JFrame {
 		jLabelTitle.setText("Title");
 		jLabelTitle.setBounds(new Rectangle(15, 50, 130, 15));
 		jTextTitle.setBounds(new Rectangle(15, 70, 665, 25));
-		jTextTitle.setFont(new Font("Tahoma", 0, 16));
+		jTextTitle.setFont(fontTahoma16);
 
 		jButtonNext.setText("Next");
-		jButtonNext.setBounds(new Rectangle(420, 100, 80, 25));
+		jButtonNext.setBounds(new Rectangle(400, 100, 80, 25));
+		jButtonNext.setFont(fontDialog14);
 		jButtonNext.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -131,15 +139,21 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jTextOld.setText("0");
-		jTextOld.setBounds(new Rectangle(510, 100, 25, 25));
+		jTextOld.setBounds(new Rectangle(495, 100, 25, 25));
+		jTextOld.setFont(fontTahoma16);
 		jLabelOld.setText("Old");
-		jLabelOld.setBounds(new Rectangle(535, 100, 25, 25));
+		jLabelOld.setBounds(new Rectangle(520, 100, 30, 25));
+		jLabelOld.setFont(fontDialog14);
 		jTextNew.setText("0");
-		jTextNew.setBounds(new Rectangle(560, 100, 25, 25));
+		jTextNew.setBounds(new Rectangle(550, 100, 25, 25));
+		jTextNew.setFont(fontTahoma16);
 		jLabelNew.setText("New");
-		jLabelNew.setBounds(new Rectangle(585, 100, 25, 25));
+		jLabelNew.setBounds(new Rectangle(575, 100, 30, 25));
+		jLabelNew.setFont(fontDialog14);
+
 		jButtonReview.setText("Rev");
-		jButtonReview.setBounds(new Rectangle(620, 100, 59, 25));
+		jButtonReview.setBounds(new Rectangle(615, 100, 64, 25));
+		jButtonReview.setFont(fontDialog14);
 		jButtonReview.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -152,7 +166,7 @@ public class FrameMain extends JFrame {
 		jTextDef.setBounds(new Rectangle(15, 130, 515, 175));
 		jTextDef.setLineWrap(true);
 		jTextDef.setWrapStyleWord(true);
-		jTextDef.setFont(new Font("Tahoma", 0, 16));
+		jTextDef.setFont(fontTahoma16);
 		jLabelExample.setText("Example");
 		jLabelExample.setBounds(new Rectangle(15, 315, 200, 15));
 		jTextExample.setBounds(new Rectangle(15, 335, 515, 205));
@@ -161,7 +175,8 @@ public class FrameMain extends JFrame {
 		jTextExample.setFont(new Font("Tahoma", 0, 16));
 
 		jButtonAdd.setText("Add");
-		jButtonAdd.setBounds(new Rectangle(315, 550, 80, 25));
+		jButtonAdd.setBounds(new Rectangle(295, 550, 85, 25));
+		jButtonAdd.setFont(fontDialog14);
 		jButtonAdd.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -175,7 +190,8 @@ public class FrameMain extends JFrame {
 		jLabelStats2.setBounds(new Rectangle(15, 568, 330, 15));
 
 		jButtonClear.setText("Clear");
-		jButtonClear.setBounds(new Rectangle(505, 585, 80, 25));
+		jButtonClear.setBounds(new Rectangle(495, 585, 85, 25));
+		jButtonClear.setFont(fontDialog14);
 		jButtonClear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -184,7 +200,8 @@ public class FrameMain extends JFrame {
 		});
 
 		jButtonMine.setText("Mine");
-		jButtonMine.setBounds(new Rectangle(600, 585, 80, 25));
+		jButtonMine.setBounds(new Rectangle(595, 585, 85, 25));
+		jButtonMine.setFont(fontDialog14);
 		jButtonMine.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -192,11 +209,12 @@ public class FrameMain extends JFrame {
 			}
 		});
 		jScrollMine.setBounds(new Rectangle(545, 130, 135, 410));
-		jTextMine.setFont(new Font("Tahoma", 0, 16));
+		jTextMine.setFont(fontTahoma16);
 		jTextMine.setLineWrap(true);
 
 		jButtonFind.setText("Find");
-		jButtonFind.setBounds(new Rectangle(410, 550, 80, 25));
+		jButtonFind.setBounds(new Rectangle(395, 550, 85, 25));
+		jButtonFind.setFont(fontDialog14);
 		jButtonFind.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -204,8 +222,9 @@ public class FrameMain extends JFrame {
 			}
 		});
 
-		jButtonChange.setText("Change");
-		jButtonChange.setBounds(new Rectangle(505, 550, 80, 25));
+		jButtonChange.setText("Title");
+		jButtonChange.setBounds(new Rectangle(495, 550, 85, 25));
+		jButtonChange.setFont(fontDialog14);
 		jButtonChange.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -214,7 +233,8 @@ public class FrameMain extends JFrame {
 		});
 
 		jButtonUpdate.setText("Update");
-		jButtonUpdate.setBounds(new Rectangle(600, 550, 80, 25));
+		jButtonUpdate.setBounds(new Rectangle(595, 550, 85, 25));
+		jButtonUpdate.setFont(fontDialog14);
 		jButtonUpdate.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -223,7 +243,8 @@ public class FrameMain extends JFrame {
 		});
 
 		jButtonSave.setText("Save");
-		jButtonSave.setBounds(new Rectangle(410, 585, 80, 25));
+		jButtonSave.setBounds(new Rectangle(395, 585, 85, 25));
+		jButtonSave.setFont(fontDialog14);
 		jButtonSave.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
