@@ -27,11 +27,11 @@ public class FrameMain extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private Manager manager;
 	private Word word;
-	private final JLabel jLabelTitle = new JLabel("Title");
+
 	private final JTextField jTextTitle = new JTextField();
-	private final JLabel jLabelDef = new JLabel("Definition");
+
 	private final JTextArea jTextDef = new JTextArea();
-	private final JLabel jLabelExample = new JLabel("Example");
+
 	private final JTextArea jTextExample = new JTextArea();
 	private final JButton jButtonShow = new JButton("Show");
 	private final JButton jButtonNext = new JButton("Next");
@@ -71,7 +71,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 52");
+		setTitle("WAD 53");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
@@ -96,6 +96,7 @@ public class FrameMain extends JFrame {
 				onShow(e);
 			}
 		});
+
 		jRadioYes.setText("Yes");
 		jRadioYes.setBounds(new Rectangle(495, 45, 52, 15));
 		jRadioYes.setFont(fontDialog14);
@@ -105,6 +106,7 @@ public class FrameMain extends JFrame {
 				onYes(e);
 			}
 		});
+
 		jRadioNo.setText("No");
 		jRadioNo.setBounds(new Rectangle(550, 45, 45, 15));
 		jRadioNo.setFont(fontDialog14);
@@ -114,6 +116,7 @@ public class FrameMain extends JFrame {
 				onNo(e);
 			}
 		});
+
 		jButtonUndo.setText("Undo");
 		jButtonUndo.setBounds(new Rectangle(605, 40, 74, 25));
 		jButtonUndo.setFont(fontDialog14);
@@ -124,8 +127,6 @@ public class FrameMain extends JFrame {
 			}
 		});
 
-		jLabelTitle.setText("Title");
-		jLabelTitle.setBounds(new Rectangle(15, 50, 130, 15));
 		jTextTitle.setBounds(new Rectangle(15, 70, 665, 25));
 		jTextTitle.setFont(fontTahoma16);
 
@@ -138,15 +139,19 @@ public class FrameMain extends JFrame {
 				onNext(e);
 			}
 		});
+
 		jTextOld.setText("0");
 		jTextOld.setBounds(new Rectangle(495, 100, 25, 25));
 		jTextOld.setFont(fontTahoma16);
+
 		jLabelOld.setText("Old");
 		jLabelOld.setBounds(new Rectangle(520, 100, 30, 25));
 		jLabelOld.setFont(fontDialog14);
+
 		jTextNew.setText("0");
 		jTextNew.setBounds(new Rectangle(550, 100, 25, 25));
 		jTextNew.setFont(fontTahoma16);
+
 		jLabelNew.setText("New");
 		jLabelNew.setBounds(new Rectangle(575, 100, 30, 25));
 		jLabelNew.setFont(fontDialog14);
@@ -161,14 +166,11 @@ public class FrameMain extends JFrame {
 			}
 		});
 
-		jLabelDef.setText("Definition");
-		jLabelDef.setBounds(new Rectangle(15, 110, 200, 15));
 		jTextDef.setBounds(new Rectangle(15, 130, 515, 175));
 		jTextDef.setLineWrap(true);
 		jTextDef.setWrapStyleWord(true);
 		jTextDef.setFont(fontTahoma16);
-		jLabelExample.setText("Example");
-		jLabelExample.setBounds(new Rectangle(15, 315, 200, 15));
+
 		jTextExample.setBounds(new Rectangle(15, 335, 515, 205));
 		jTextExample.setLineWrap(true);
 		jTextExample.setWrapStyleWord(true);
@@ -183,11 +185,14 @@ public class FrameMain extends JFrame {
 				onAdd(e);
 			}
 		});
+
 		jLabelStats.setText("");
-		jLabelStats.setBounds(new Rectangle(15, 548, 330, 15));
+		jLabelStats.setBounds(new Rectangle(15, 555, 330, 15));
 		jLabelStats.setFont(new Font("Verdana", Font.BOLD, 16));
+
 		jLabelStats2.setText("");
-		jLabelStats2.setBounds(new Rectangle(15, 568, 330, 15));
+		jLabelStats2.setFont(fontDialog14);
+		jLabelStats2.setBounds(new Rectangle(15, 590, 330, 15));
 
 		jButtonClear.setText("Clear");
 		jButtonClear.setBounds(new Rectangle(495, 585, 85, 25));
@@ -268,11 +273,8 @@ public class FrameMain extends JFrame {
 		cont.add(jButtonNext, null);
 		cont.add(jButtonShow, null);
 		cont.add(jTextExample, null);
-		cont.add(jLabelExample, null);
 		cont.add(jTextDef, null);
-		cont.add(jLabelDef, null);
 		cont.add(jTextTitle, null);
-		cont.add(jLabelTitle, null);
 		cont.add(jButtonMine, null);
 		cont.add(jScrollMine, null);
 		cont.add(jButtonFind, null);
