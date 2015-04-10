@@ -21,7 +21,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.WindowConstants;
 
 public class FrameMain extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -71,7 +70,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 53");
+		setTitle("WAD 54");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
@@ -282,9 +281,7 @@ public class FrameMain extends JFrame {
 		cont.add(jButtonUpdate, null);
 		cont.add(jButtonSave, null);
 
-		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		class ClosingListener extends WindowAdapter {
-
+		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent evt) {
 				try {
@@ -299,9 +296,7 @@ public class FrameMain extends JFrame {
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
-		}
-		ClosingListener closingListener = new ClosingListener();
-		addWindowListener(closingListener);
+		});
 		updateStats();
 		showCountByDay();
 	}
