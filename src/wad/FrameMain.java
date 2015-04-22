@@ -70,12 +70,12 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 54");
+		setTitle("WAD 55");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
-		Font fontDialog14 = new Font("Dialog", 1, 14);
-		Font fontTahoma16 = new Font("Tahoma", 0, 16);
+		Font fontDialog14 = new Font("Dialog", Font.BOLD, 14);
+		Font fontTahoma16 = new Font("Tahoma", Font.PLAIN, 16);
 
 		jTextResp.setBounds(new Rectangle(15, 10, 665, 25));
 		jTextResp.setFont(fontTahoma16);
@@ -173,7 +173,7 @@ public class FrameMain extends JFrame {
 		jTextExample.setBounds(new Rectangle(15, 335, 515, 205));
 		jTextExample.setLineWrap(true);
 		jTextExample.setWrapStyleWord(true);
-		jTextExample.setFont(new Font("Tahoma", 0, 16));
+		jTextExample.setFont(fontTahoma16);
 
 		jButtonAdd.setText("Add");
 		jButtonAdd.setBounds(new Rectangle(295, 550, 85, 25));
@@ -190,8 +190,8 @@ public class FrameMain extends JFrame {
 		jLabelStats.setFont(new Font("Verdana", Font.BOLD, 16));
 
 		jLabelStats2.setText("");
-		jLabelStats2.setFont(fontDialog14);
 		jLabelStats2.setBounds(new Rectangle(15, 590, 330, 15));
+		jLabelStats2.setFont(new Font("Verdana", Font.BOLD, 14));
 
 		jButtonClear.setText("Clear");
 		jButtonClear.setBounds(new Rectangle(495, 585, 85, 25));
@@ -356,8 +356,6 @@ public class FrameMain extends JFrame {
 	private void updateStats() {
 		int[] stats = manager.getStats();
 		StringBuilder statsStr = new StringBuilder();
-		StringBuilder statsStr2 = new StringBuilder();
-		statsStr2.append("G:" + manager.getGraduatedCount() + " ");
 		int total = 0;
 		for (int i = 0; i < stats.length; ++i) {
 			long count = stats[i];
@@ -368,19 +366,18 @@ public class FrameMain extends JFrame {
 				statsStr.append(count);
 				statsStr.append(" ");
 			}
-			else {
-				statsStr2.append(Manager.intervalLbl[i]);
-				statsStr2.append(":");
-				statsStr2.append(count);
-				statsStr2.append(" ");
-			}
 		}
+		statsStr.append("C:");
+		statsStr.append(manager.getCandCount());
+
+		StringBuilder statsStr2 = new StringBuilder();
+		statsStr2.append("T:" + (manager.getGraduatedCount() + total) + " ");
+		statsStr2.append("G:" + manager.getGraduatedCount() + " ");
 		statsStr2.append(total);
 		statsStr2.append("(");
 		statsStr2.append(manager.getRemainingNewCount());
 		statsStr2.append(")");
-		statsStr.append("C:");
-		statsStr.append(manager.getCandCount());
+
 		jLabelStats.setText(statsStr.toString());
 		jLabelStats2.setText(statsStr2.toString());
 	}
