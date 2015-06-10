@@ -70,7 +70,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 55");
+		setTitle("WAD 56");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
@@ -314,7 +314,6 @@ public class FrameMain extends JFrame {
 		}
 		else {
 			jTextResp.setForeground(new Color(192, 0, 0));
-			jRadioNo.requestFocusInWindow();
 		}
 	}
 

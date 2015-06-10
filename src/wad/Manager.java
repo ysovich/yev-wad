@@ -247,8 +247,6 @@ public class Manager {
 				word.attemptList.clear();
 			}
 		}
-		lastAttempts.addFirst(wordTitle);
-		lastAttempts.pollLast();
 		return graduatedWord;
 	}
 
@@ -335,6 +333,11 @@ public class Manager {
 			int selIndex = new Random().nextInt(reviewList.size());
 			selWord = reviewList.get(selIndex);
 			reviewList.remove(selIndex);
+		}
+
+		if (selWord != null) {
+			lastAttempts.addFirst(selWord.title);
+			lastAttempts.pollLast();
 		}
 
 		return selWord;
