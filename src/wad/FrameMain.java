@@ -70,7 +70,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 56");
+		setTitle("WAD 57");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
@@ -314,6 +314,9 @@ public class FrameMain extends JFrame {
 		}
 		else {
 			jTextResp.setForeground(new Color(192, 0, 0));
+			if (word.attemptList == null || word.attemptList.isEmpty()) {
+				jButtonNext.requestFocusInWindow();
+			}
 		}
 	}
 
@@ -409,7 +412,7 @@ public class FrameMain extends JFrame {
 			sb.append(graduatedWord.example);
 			jTextMine.setText(sb.toString());
 		}
-		jButtonNext.requestFocusInWindow();
+		onNext(e);
 	}
 
 	private void onNo(ActionEvent e) {
