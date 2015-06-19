@@ -63,8 +63,6 @@ public class Manager {
 	private LinkedList<String> lastAttempts = new LinkedList<String>();
 	private int candCount;
 	private boolean selectOldest = true;
-	private ArrayList<Date> undoAttemptList;
-	private String undoWordTitle;
 	private ArrayList<Word> reviewList = new ArrayList<Word>();
 	private int graduatedCount;
 	private int savedHashCode;
@@ -84,7 +82,7 @@ public class Manager {
 			throw new RuntimeException(e);
 		}
 		load();
-		prepareCandidateList(new ArrayList<Word>(), new ArrayList<Word>());
+		prepareCandidateList(new ArrayList<Word>(), new ArrayList<Word>(), false);
 	}
 
 	public int[] getStats() {
@@ -238,8 +236,6 @@ public class Manager {
 			++graduatedCount;
 		}
 		else {
-			undoAttemptList = new ArrayList<Date>(word.attemptList);
-			undoWordTitle = word.title;
 			if (isCorrect) {
 				word.attemptList.add(attemptDate);
 			}
@@ -277,14 +273,14 @@ public class Manager {
 	 * @param newOldCount
 	 * @return selected word
 	 */
-	public Word getNextWord(int newOldCount, int newNewCount) {
+	public Word getNextWord(int newOldCount, int newNewCount, boolean includeNew) {
 		oldCount = newOldCount;
 		newCount = updateNewWords(newNewCount);
 
 		ArrayList<Word> candList = new ArrayList<Word>();
 		ArrayList<Word> doneList = new ArrayList<Word>();
 
-		prepareCandidateList(candList, doneList);
+		prepareCandidateList(candList, doneList, includeNew);
 
 		// exclude the last tree attempted words
 		for (String lastAttempt : lastAttempts) {
@@ -343,11 +339,12 @@ public class Manager {
 		return selWord;
 	}
 
-	private void prepareCandidateList(ArrayList<Word> candList, ArrayList<Word> doneList) {
+	private void prepareCandidateList(ArrayList<Word> candList, ArrayList<Word> doneList,
+			boolean includeNew) {
 		stats = new int[interval.length];
 
 		for (Word word : wordMap.values()) {
-			if (word.isNew) {
+			if (word.isNew && !includeNew) {
 				continue;
 			}
 			long dur = 0;
@@ -557,6 +554,7 @@ public class Manager {
 			Word word = it.next();
 			if (word.isNew) {
 				word.isNew = false;
+				word.attemptList.clear();
 				--retWordCount;
 			}
 		}
@@ -634,20 +632,6 @@ public class Manager {
 				new RuntimeException(e);
 			}
 		}
-	}
-
-	public boolean undoAttempt(String wordTitle) {
-		boolean undid = false;
-		if (undoAttemptList != null && undoWordTitle != null && undoWordTitle.equals(wordTitle)) {
-			Word word = wordMap.get(wordTitle);
-			if (word != null) {
-				word.attemptList = undoAttemptList;
-				undid = true;
-			}
-		}
-		undoAttemptList = null;
-		undoWordTitle = null;
-		return undid;
 	}
 
 	public TreeMap<Integer, Integer> getCountByDay() {

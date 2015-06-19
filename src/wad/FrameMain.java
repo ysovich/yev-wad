@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -36,7 +37,6 @@ public class FrameMain extends JFrame {
 	private final JButton jButtonNext = new JButton("Next");
 	private final JRadioButton jRadioYes = new JRadioButton("Yes");
 	private final JRadioButton jRadioNo = new JRadioButton("No");
-	private final JButton jButtonUndo = new JButton("Undo");
 	private final JButton jButtonAdd = new JButton("Add");
 	private final JTextField jTextResp = new JTextField();
 	private final JLabel jLabelStats = new JLabel();
@@ -46,6 +46,7 @@ public class FrameMain extends JFrame {
 	private final JLabel jLabelOld = new JLabel();
 	private final JTextField jTextNew = new JTextField("0");
 	private final JLabel jLabelNew = new JLabel();
+	private final JCheckBox jCheckNew = new JCheckBox("New");
 	private final JButton jButtonReview = new JButton("Review");
 	private final JButton jButtonMine = new JButton("Mine");
 	private final JTextArea jTextMine = new JTextArea();
@@ -70,7 +71,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 57");
+		setTitle("WAD 58");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
@@ -116,13 +117,13 @@ public class FrameMain extends JFrame {
 			}
 		});
 
-		jButtonUndo.setText("Undo");
-		jButtonUndo.setBounds(new Rectangle(605, 40, 74, 25));
-		jButtonUndo.setFont(fontDialog14);
-		jButtonUndo.addActionListener(new ActionListener() {
+		jButtonReview.setText("Rev");
+		jButtonReview.setBounds(new Rectangle(605, 40, 74, 25));
+		jButtonReview.setFont(fontDialog14);
+		jButtonReview.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				onUndo(e);
+				onReview(e);
 			}
 		});
 
@@ -155,15 +156,9 @@ public class FrameMain extends JFrame {
 		jLabelNew.setBounds(new Rectangle(575, 100, 30, 25));
 		jLabelNew.setFont(fontDialog14);
 
-		jButtonReview.setText("Rev");
-		jButtonReview.setBounds(new Rectangle(615, 100, 64, 25));
-		jButtonReview.setFont(fontDialog14);
-		jButtonReview.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onReview(e);
-			}
-		});
+		jCheckNew.setText("New");
+		jCheckNew.setBounds(new Rectangle(620, 100, 60, 25));
+		jCheckNew.setFont(fontDialog14);
 
 		jTextDef.setBounds(new Rectangle(15, 130, 515, 175));
 		jTextDef.setLineWrap(true);
@@ -256,6 +251,7 @@ public class FrameMain extends JFrame {
 			}
 		});
 
+		cont.add(jCheckNew, null);
 		cont.add(jLabelNew, null);
 		cont.add(jTextNew, null);
 		cont.add(jButtonReview, null);
@@ -268,7 +264,6 @@ public class FrameMain extends JFrame {
 		cont.add(jButtonAdd, null);
 		cont.add(jRadioNo, null);
 		cont.add(jRadioYes, null);
-		cont.add(jButtonUndo, null);
 		cont.add(jButtonNext, null);
 		cont.add(jButtonShow, null);
 		cont.add(jTextExample, null);
@@ -335,7 +330,7 @@ public class FrameMain extends JFrame {
 		catch (NumberFormatException ex) {
 			newCount = 0;
 		}
-		word = manager.getNextWord(oldCount, newCount);
+		word = manager.getNextWord(oldCount, newCount, jCheckNew.isSelected());
 		jTextOld.setText(Integer.toString(manager.getOldCount()));
 		jTextNew.setText(Integer.toString(manager.getNewCount()));
 		jTextTitle.setText("");
@@ -421,15 +416,6 @@ public class FrameMain extends JFrame {
 		}
 		manager.addAttempt(word.title, new Date(), false);
 		jButtonNext.requestFocusInWindow();
-	}
-
-	private void onUndo(ActionEvent e) {
-		if (word != null) {
-			if (manager.undoAttempt(word.title)) {
-				jRadioYes.setSelected(false);
-				jRadioNo.setSelected(false);
-			}
-		}
 	}
 
 	private void onReview(ActionEvent e) {
