@@ -71,7 +71,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 58");
+		setTitle("WAD 59");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
@@ -474,12 +474,19 @@ public class FrameMain extends JFrame {
 	}
 
 	private void showCountByDay() {
-		TreeMap<Integer, Integer> countByDay = manager.getCountByDay();
+		TreeMap<Integer, Integer[]> countByDay = manager.getCountByDay();
 		StringBuilder sb = new StringBuilder();
-		for (Map.Entry<Integer, Integer> entry : countByDay.descendingMap().entrySet()) {
+		for (Map.Entry<Integer, Integer[]> entry : countByDay.descendingMap().entrySet()) {
 			sb.append(entry.getKey());
 			sb.append(" : ");
-			sb.append(entry.getValue());
+			if (entry.getValue()[0] != null) {
+				sb.append(entry.getValue()[0]);
+			}
+			if (entry.getValue()[1] != null) {
+				sb.append("(");
+				sb.append(entry.getValue()[1]);
+				sb.append(")");
+			}
 			sb.append('\n');
 		}
 		jTextMine.setText(sb.toString());

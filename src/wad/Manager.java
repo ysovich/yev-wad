@@ -634,8 +634,8 @@ public class Manager {
 		}
 	}
 
-	public TreeMap<Integer, Integer> getCountByDay() {
-		TreeMap<Integer, Integer> countByDay = new TreeMap<Integer, Integer>();
+	public TreeMap<Integer, Integer[]> getCountByDay() {
+		TreeMap<Integer, Integer[]> countByDay = new TreeMap<Integer, Integer[]>();
 		Date now = new Date();
 		for (Word word : wordMap.values()) {
 			Integer day = 0;
@@ -643,12 +643,16 @@ public class Manager {
 				Date firstAttempt = Collections.min(word.attemptList);
 				day = (int) Math.round(((double) calcDurationDays(now, firstAttempt)) / DAY);
 			}
-			Integer count = countByDay.get(day);
+			Integer[] count = countByDay.get(day);
 			if (count == null) {
-				count = 0;
+				count = new Integer[2];
+				countByDay.put(day, count);
 			}
-			count = count + 1;
-			countByDay.put(day, count);
+			int index = word.isNew ? 1 : 0;
+			if (count[index] == null) {
+				count[index] = 0;
+			}
+			count[index] = count[index] + 1;
 		}
 		return countByDay;
 	}
