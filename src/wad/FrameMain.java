@@ -71,7 +71,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 59");
+		setTitle("WAD 60");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
@@ -160,7 +160,7 @@ public class FrameMain extends JFrame {
 		jCheckNew.setBounds(new Rectangle(620, 100, 60, 25));
 		jCheckNew.setFont(fontDialog14);
 
-		jTextDef.setBounds(new Rectangle(15, 130, 515, 175));
+		jTextDef.setBounds(new Rectangle(15, 130, 515, 185));
 		jTextDef.setLineWrap(true);
 		jTextDef.setWrapStyleWord(true);
 		jTextDef.setFont(fontTahoma16);
