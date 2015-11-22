@@ -201,7 +201,7 @@ public class Manager {
 		savedHashCode = getDataHashCode();
 	}
 
-	public boolean addWord(Word word) {
+	public boolean addWord(Word word, boolean includeNew) {
 		if (word.title == null || word.title.length() == 0) {
 			JOptionPane.showMessageDialog(null, "Missing title");
 			return false;
@@ -215,6 +215,7 @@ public class Manager {
 			return false;
 		}
 		wordMap.put(word.title, word);
+		prepareCandidateList(new ArrayList<Word>(), new ArrayList<Word>(), includeNew);
 		return true;
 	}
 
@@ -415,8 +416,6 @@ public class Manager {
 				continue;
 			}
 			long dur = 0;
-			Date now = new Date();
-			Date lastDate = now;
 			if (word.attemptList.size() > 1) {
 				Date prevDate = word.attemptList.get(0);
 				for (int i = 1; i < word.attemptList.size(); ++i) {
@@ -428,7 +427,6 @@ public class Manager {
 					if (curDur > dur) {
 						dur = curDur;
 					}
-					lastDate = curDate;
 					prevDate = curDate;
 				}
 			}

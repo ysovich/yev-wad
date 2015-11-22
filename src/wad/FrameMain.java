@@ -71,7 +71,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 60");
+		setTitle("WAD 61");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
@@ -385,7 +385,7 @@ public class FrameMain extends JFrame {
 		newWord.definition = jTextDef.getText();
 		newWord.example = jTextExample.getText();
 		newWord.isNew = true;
-		if (manager.addWord(newWord)) {
+		if (manager.addWord(newWord, jCheckNew.isSelected())) {
 			updateStats();
 			clearWord();
 		}
