@@ -58,7 +58,6 @@ public class Manager {
 
 	private LinkedHashMap<String, Word> wordMap;
 	private int stats[];
-	private int oldCount;
 	private int newCount;
 	private LinkedList<String> lastAttempts = new LinkedList<String>();
 	private int candCount;
@@ -87,10 +86,6 @@ public class Manager {
 
 	public int[] getStats() {
 		return stats;
-	}
-
-	public int getOldCount() {
-		return oldCount;
 	}
 
 	public int getNewCount() {
@@ -274,8 +269,7 @@ public class Manager {
 	 * @param newOldCount
 	 * @return selected word
 	 */
-	public Word getNextWord(int newOldCount, int newNewCount, boolean includeNew) {
-		oldCount = newOldCount;
+	public Word getNextWord(int newNewCount, boolean includeNew) {
 		newCount = updateNewWords(newNewCount);
 
 		ArrayList<Word> candList = new ArrayList<Word>();
@@ -319,11 +313,6 @@ public class Manager {
 			}
 			// alternate the selection method
 			selectOldest = !selectOldest;
-		}
-
-		if (oldCount > 0 && selWord == null && !doneList.isEmpty()) {
-			selWord = doneList.get(new Random().nextInt(doneList.size()));
-			--oldCount;
 		}
 
 		if (selWord == null && !reviewList.isEmpty()) {
