@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 import java.util.Properties;
 import java.util.Random;
 import java.util.TreeMap;
@@ -537,6 +538,29 @@ public class Manager {
 		}
 		int retWordCount = newWordCount;
 
+		// find top N new words with the latest attempt
+		PriorityQueue<Word> queue = new PriorityQueue<Word>(newWordCount + 1, new Comparator<Word>() {
+			@Override
+			public int compare(Word o1, Word o2) {
+				return Collections.min(o2.attemptList).compareTo(Collections.min(o1.attemptList));
+			}
+		});
+		for (Word word : wordMap.values()) {
+			if (word.isNew && !word.attemptList.isEmpty()) {
+				queue.add(word);
+				if (queue.size() > newWordCount) {
+					queue.poll();
+				}
+			}
+		}
+		for (Iterator<Word> it = queue.iterator(); it.hasNext() && retWordCount > 0;) {
+			Word word = it.next();
+			word.isNew = false;
+			word.attemptList.clear();
+			--retWordCount;
+		}
+
+		// handle words with no attempts
 		for (Iterator<Word> it = wordMap.values().iterator(); it.hasNext() && retWordCount > 0;) {
 			Word word = it.next();
 			if (word.isNew) {
@@ -629,6 +653,10 @@ public class Manager {
 			if (!word.attemptList.isEmpty()) {
 				Date firstAttempt = Collections.min(word.attemptList);
 				day = (int) Math.round(((double) calcDurationDays(now, firstAttempt)) / DAY);
+				if (day == 89 && word.isNew) {
+					System.out.println(word.title);
+					System.out.println(word.attemptList);
+				}
 			}
 			Integer[] count = countByDay.get(day);
 			if (count == null) {
