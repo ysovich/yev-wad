@@ -653,10 +653,6 @@ public class Manager {
 			if (!word.attemptList.isEmpty()) {
 				Date firstAttempt = Collections.min(word.attemptList);
 				day = (int) Math.round(((double) calcDurationDays(now, firstAttempt)) / DAY);
-				if (day == 89 && word.isNew) {
-					System.out.println(word.title);
-					System.out.println(word.attemptList);
-				}
 			}
 			Integer[] count = countByDay.get(day);
 			if (count == null) {
@@ -670,6 +666,13 @@ public class Manager {
 			count[index] = count[index] + 1;
 		}
 		return countByDay;
+	}
+
+	public int getWordAge(Word word) {
+		Date now = new Date();
+		Date firstAttempt = Collections.min(word.attemptList);
+		int day = (int) Math.round(((double) calcDurationDays(now, firstAttempt)) / DAY);
+		return day;
 	}
 
 }

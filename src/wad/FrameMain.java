@@ -27,22 +27,23 @@ public class FrameMain extends JFrame {
 	private Manager manager;
 	private Word word;
 
+	private final JTextField jTextResp = new JTextField();
 	private final JTextField jTextTitle = new JTextField();
-
 	private final JTextArea jTextDef = new JTextArea();
-
 	private final JTextArea jTextExample = new JTextArea();
+
+	private final JLabel jLabelAge = new JLabel();
 	private final JButton jButtonShow = new JButton("Show");
-	private final JButton jButtonNext = new JButton("Next");
 	private final JButton jButtonYes = new JButton("Yes");
 	private final JButton jButtonNo = new JButton("No");
-	private final JButton jButtonAdd = new JButton("Add");
-	private final JTextField jTextResp = new JTextField();
-	private final JLabel jLabelStats = new JLabel();
-	private final JLabel jLabelStats2 = new JLabel();
-	private final JButton jButtonClear = new JButton("Clear");
+	private final JButton jButtonNext = new JButton("Next");
 	private final JTextField jTextNew = new JTextField("0");
 	private final JCheckBox jCheckNew = new JCheckBox("New");
+
+	private final JLabel jLabelStats = new JLabel();
+	private final JLabel jLabelStats2 = new JLabel();
+	private final JButton jButtonAdd = new JButton("Add");
+	private final JButton jButtonClear = new JButton("Clear");
 	private final JButton jButtonReview = new JButton("Review");
 	private final JButton jButtonMine = new JButton("Mine");
 	private final JTextArea jTextMine = new JTextArea();
@@ -67,7 +68,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 63");
+		setTitle("WAD 64");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
@@ -82,6 +83,10 @@ public class FrameMain extends JFrame {
 				onShow(e);
 			}
 		});
+
+		jLabelAge.setText("");
+		jLabelAge.setBounds(new Rectangle(15, 40, 80, 25));
+		jLabelAge.setFont(new Font("Verdana", Font.BOLD, 16));
 
 		jButtonShow.setText("Show");
 		jButtonShow.setBounds(new Rectangle(200, 40, 80, 25));
@@ -242,6 +247,7 @@ public class FrameMain extends JFrame {
 		cont.add(jLabelStats, null);
 		cont.add(jLabelStats2, null);
 		cont.add(jTextResp, null);
+		cont.add(jLabelAge, null);
 		cont.add(jButtonAdd, null);
 		cont.add(jButtonNo, null);
 		cont.add(jButtonYes, null);
@@ -305,16 +311,21 @@ public class FrameMain extends JFrame {
 		jTextNew.setText(Integer.toString(manager.getNewCount()));
 		jTextTitle.setText("");
 		jTextResp.setText("");
-		jTextDef.setText(word == null ? "" : word.definition);
 		jTextExample.setText("");
 		jButtonYes.setSelected(false);
 		jButtonNo.setSelected(false);
 		jTextResp.setForeground(Color.black);
 		if (word == null) {
 			jTextDef.setText("");
+			jLabelAge.setText("");
 		}
 		else {
 			jTextDef.setText((manager.isGraduation(word) ? "***GRADUATION***\n" : "") + word.definition);
+			String age = Integer.toString(manager.getWordAge(word));
+			if (word.isNew) {
+				age = "(" + age + ")";
+			}
+			jLabelAge.setText(age);
 		}
 		updateStats();
 		jTextResp.requestFocusInWindow();
@@ -401,6 +412,7 @@ public class FrameMain extends JFrame {
 		jTextTitle.setText("");
 		jTextResp.setText("");
 		jTextDef.setText("");
+		jLabelAge.setText("");
 		jTextExample.setText("");
 		jTextResp.setForeground(Color.black);
 		word = null;
@@ -418,6 +430,11 @@ public class FrameMain extends JFrame {
 			word = foundWord;
 			jTextTitle.setText(word.title);
 			jTextDef.setText(word.definition);
+			String age = Integer.toString(manager.getWordAge(word));
+			if (word.isNew) {
+				age = "(" + age + ")";
+			}
+			jLabelAge.setText(age);
 			jTextExample.setText(word.example);
 		}
 	}
