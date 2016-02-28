@@ -669,9 +669,12 @@ public class Manager {
 	}
 
 	public int getWordAge(Word word) {
-		Date now = new Date();
-		Date firstAttempt = Collections.min(word.attemptList);
-		int day = (int) Math.round(((double) calcDurationDays(now, firstAttempt)) / DAY);
+		int day = 0;
+		if (word != null && !word.attemptList.isEmpty()) {
+			Date now = new Date();
+			Date firstAttempt = Collections.min(word.attemptList);
+			day = (int) Math.round(((double) calcDurationDays(now, firstAttempt)) / DAY);
+		}
 		return day;
 	}
 
