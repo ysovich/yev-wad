@@ -68,7 +68,7 @@ public class FrameMain extends JFrame {
 	private void jbInit() throws Exception {
 		Container cont = getContentPane();
 		cont.setLayout(null);
-		setTitle("WAD 64");
+		setTitle("WAD 65");
 		setSize(new Dimension(700, 650));
 		setResizable(false);
 
@@ -101,6 +101,7 @@ public class FrameMain extends JFrame {
 		jButtonYes.setText("Yes");
 		jButtonYes.setBounds(new Rectangle(300, 40, 80, 25));
 		jButtonYes.setFont(fontDialog14);
+		jButtonYes.setForeground(new Color(0, 128, 0));
 		jButtonYes.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -111,6 +112,7 @@ public class FrameMain extends JFrame {
 		jButtonNo.setText("No");
 		jButtonNo.setBounds(new Rectangle(400, 40, 80, 25));
 		jButtonNo.setFont(fontDialog14);
+		jButtonNo.setForeground(new Color(192, 0, 0));
 		jButtonNo.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -373,7 +375,7 @@ public class FrameMain extends JFrame {
 	}
 
 	private void onYes(ActionEvent e) {
-		if (word == null) {
+		if (word == null || !word.title.equals(jTextTitle.getText())) {
 			return;
 		}
 		Word graduatedWord = manager.addAttempt(word.title, new Date(), true);
@@ -392,7 +394,7 @@ public class FrameMain extends JFrame {
 	}
 
 	private void onNo(ActionEvent e) {
-		if (word == null) {
+		if (word == null || !word.title.equals(jTextTitle.getText())) {
 			return;
 		}
 		manager.addAttempt(word.title, new Date(), false);
