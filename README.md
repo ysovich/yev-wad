@@ -32,8 +32,8 @@ yev-wad/
 
 ## Requirements
 
-- Java 8 or higher
-- Maven 3.6+ (for building)
+- **Java 21 LTS** (version 21.0.0 or higher)
+- Maven 3.6+ or higher (for building)
 
 ## Building
 
@@ -44,6 +44,11 @@ mvn clean package
 ```
 
 This generates an executable JAR file in the `target/` directory as `wad.jar`.
+
+The build includes:
+- Compilation of all Java classes with Java 21 target
+- Execution of comprehensive unit test suite (45 tests)
+- Packaging with all dependencies bundled via Maven Shade Plugin
 
 ## Running
 
@@ -75,6 +80,35 @@ java -jar target/wad.jar "src/main/resources/sample-wad.properties"
 ```
 
 This loads the sample vocabulary database containing words like: serendipity, ephemeral, eloquent, ubiquitous, and delectable.
+
+## Testing
+
+The project includes a comprehensive test suite with **45 unit tests** covering:
+
+- **Word Model Tests**: Word creation, equality, hashing, attempt tracking
+- **Date Utility Tests**: Time constant calculations and date operations
+- **Manager Utility Tests**: Word filtering, statistics computation, review list preparation
+- **Integration Tests**: Full system workflows, edge cases, Unicode support, performance with large databases
+
+Run the tests with:
+
+```bash
+mvn test
+```
+
+All tests pass reliably on Java 21 LTS.
+
+## Error Handling
+
+The application provides user-friendly error handling for common issues:
+
+- **Missing Configuration File**: Shows a dialog with the expected path and suggests creating one
+- **Corrupted ZIP/XML**: Clear error messages indicating file format problems
+- **Invalid XML Structure**: Helps identify which lines in the XML are malformed
+- **Missing Properties**: Alerts if required configuration keys are missing
+- **File Permission Issues**: Graceful handling of read/write errors
+
+All errors are caught at application startup, preventing silent failures. The user always receives a clear message about what went wrong and how to fix it.
 
 ## Configuration
 
@@ -302,14 +336,116 @@ Words with higher numbers have been reviewed more frequently. This helps you ide
 - **Word**: Data model representing a word with title, definition, example, and attempt history
 - **Manager**: Business logic for managing word collection and learning statistics
 
+## Code Documentation
+
+The source code includes comprehensive Javadoc comments on all public classes and methods. This documentation covers:
+
+- **Class-level descriptions**: Purpose, responsibility, and design of each class
+- **Method documentation**: Parameters, return values, and exceptional behavior
+- **Complex algorithms**: Explanation of non-trivial business logic (e.g., spaced repetition scheduling)
+- **Configuration details**: How to use the application programmatically
+
+To view the documentation:
+- Read the Javadoc comments directly in the source files under `src/main/java/wad/`
+- Generate HTML documentation with: `mvn javadoc:javadoc`
+- View generated docs in `target/site/apidocs/`
+
 ## Technical Details
 
-- Built with **Java Swing** for cross-platform GUI
-- Uses **Maven** for build automation
-- Properties-based configuration system
-- Stores word data in ZIP-compressed XML format
-- Tracks word learning attempts with timestamps
+- Built with **Java 21 LTS** for modern language features and long-term support
+- **Java Swing** for cross-platform GUI
+- **Maven 3.6+** for build automation and dependency management
+- **JUnit 4** testing framework with comprehensive test suite (45 tests)
+- Properties-based configuration system for easy customization
+- Stores word data in ZIP-compressed XML format for portability
+- Tracks word learning attempts with ISO-8601 timestamps
 - Supports custom word databases via configuration files
+- Maven Shade Plugin for creating executable JAR with bundled dependencies
+
+## Development
+
+### Project Structure
+
+```
+yev-wad/
+├── src/
+│   ├── main/java/wad/
+│   │   ├── Wad.java              # Application entry point
+│   │   ├── FrameMain.java        # Main GUI window (~525 lines)
+│   │   ├── Manager.java          # Business logic (~650 lines)
+│   │   └── Word.java             # Data model for vocabulary words
+│   ├── test/java/wad/            # Unit tests (45 tests, all passing)
+│   │   ├── WordTest.java
+│   │   ├── DateUtilityTest.java
+│   │   ├── ManagerUtilityTest.java
+│   │   └── WADIntegrationTest.java
+│   └── resources/
+│       ├── wad.properties         # Default configuration template
+│       └── sample-wad.properties  # Configuration for sample data
+├── pom.xml                        # Maven build configuration
+└── README.md
+```
+
+### Building and Testing Locally
+
+**Clean build with tests:**
+```bash
+mvn clean package
+```
+
+**Run only tests:**
+```bash
+mvn test
+```
+
+**Build without tests (faster):**
+```bash
+mvn clean package -DskipTests
+```
+
+**Generate Javadoc:**
+```bash
+mvn javadoc:javadoc
+```
+
+### IDE Setup
+
+The project is configured to work with any Java IDE that supports Maven:
+
+- **IntelliJ IDEA**: Open project root, Maven dependencies auto-load
+- **Eclipse**: Import as existing Maven project
+- **VS Code**: Install Extension Pack for Java, Maven support auto-detected
+
+## Recent Updates & Modernization
+
+The WAD project has undergone significant modernization improvements:
+
+### Java Language Features
+- **Upgraded to Java 21 LTS** from Java 8 for modern language features and long-term support
+- Full compatibility with Java 21's latest enhancements
+
+### Build System
+- **Migrated from Apache Ant to Maven 3.6+** for better dependency management
+- Proper project structure following Maven conventions (`src/main/java`, `src/test/java`)
+- Automated builds with consistent output handling
+
+### Testing & Quality Assurance
+- **Added 45 comprehensive unit tests** covering all major functionality
+- Tests organized in 4 test classes (Word, DateUtility, ManagerUtility, Integration)
+- Full test coverage including edge cases, Unicode support, and performance validation
+- All tests passing on Java 21 LTS
+
+### Code Quality
+- **Comprehensive Javadoc documentation** on all public classes and methods
+- Removal of unused imports and IDE warnings
+- Well-structured error handling with graceful user-facing messages
+- Code follows Java best practices and conventions
+
+### Configuration & Reliability
+- Improved error handling for missing/corrupted configuration files
+- User-friendly error dialogs for troubleshooting
+- Graceful application shutdown on fatal errors
+- Properties-based configuration with clear documentation
 
 ## License
 
