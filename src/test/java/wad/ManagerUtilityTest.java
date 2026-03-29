@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
 
 import org.junit.Before;
 import org.junit.Test;
