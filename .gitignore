@@ -1,0 +1,52 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Compiled classes
+classes/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE
+.classpath
+.project
+.settings/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Eclipse
+bin/
+.recommenders/
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+*.ids
+*.orig
+
+# Build artifacts
+build/
+dist/
+out/
+
+# Test output
+test_output.txt
+
+# OS
+Thumbs.db
+.DS_Store
