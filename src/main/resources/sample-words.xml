@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wad g="3">
+  <w t="serendipity">
+    <d>The occurrence of events by chance in a happy or beneficial way; finding something good by luck
+Discovering that old friend by ~ was wonderful
+The ~ of finding money in an old coat pocket</d>
+    <e>serendipitous
+serendipitously</e>
+    <a>2026-03-25T09:00:00</a>
+    <a>2026-03-26T14:30:00</a>
+  </w>
+  <w t="ephemeral">
+    <d>Lasting for a very short time; transitory
+The beauty of cherry blossoms is ~
+~ insects live only for a few days</d>
+    <e>ephemerally</e>
+    <a>2026-03-25T10:15:00</a>
+  </w>
+  <w t="eloquent">
+    <d>Fluent or persuasive in speaking or writing
+His ~ speech moved the audience to tears
+She gave an ~ presentation on climate change</d>
+    <e>eloquence
+eloquently</e>
+    <a>2026-03-24T08:45:00</a>
+  </w>
+  <w t="ubiquitous">
+    <d>Present, appearing, or found everywhere
+Smartphones have become ~ in modern society
+Social media is ~ among teenagers</d>
+    <e>ubiquity
+ubiquitously</e>
+    <a>2026-03-23T11:20:00</a>
+    <a>2026-03-27T15:45:00</a>
+  </w>
+  <w t="delectable">
+    <d>Delightful to eat; delicious
+The ~ pastries in the bakery window looked irresistible
+The chef prepared ~ dishes for the feast</d>
+    <e>delectably</e>
+  </w>
+</wad>
