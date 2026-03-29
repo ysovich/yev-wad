@@ -44,6 +44,24 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+/**
+ * Manages the word vocabulary database and learning statistics.
+ * 
+ * Handles loading and saving word data from/to ZIP-compressed XML files,
+ * tracking learning progress, managing word candidates for review,
+ * and computing statistics about user learning patterns.
+ * 
+ * Key Features:
+ * <ul>
+ *   <li>Loads word data from wad.xml files compressed in ZIP format</li>
+ *   <li>Tracks attempt history with timestamps for each word</li>
+ *   <li>Computes daily, hourly, and monthly statistics</li>
+ *   <li>Manages word candidates for review with smart selection</li>
+ *   <li>Supports filtering by word state (new, graduated, under review)</li>
+ * </ul>
+ * 
+ * @since 1.0
+ */
 public class Manager {
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	private static final long MINUTE = 1000 * 60;
@@ -67,6 +85,22 @@ public class Manager {
 	private int graduatedCount;
 	private int savedHashCode;
 
+	/**
+	 * Constructs a Manager with the specified configuration file.
+	 * 
+	 * Loads configuration properties (word database path, dictionary path, etc.)
+	 * from the given properties file and initializes the vocabulary database.
+	 * 
+	 * Configuration file expected properties:
+	 * <ul>
+	 *   <li>{@code words} - Path to wad.xml.zip (compressed word database)</li>
+	 *   <li>{@code dict} - Path to dictionary file for suggestions</li>
+	 *   <li>{@code down} - Path to downloaded/reviewed words file</li>
+	 * </ul>
+	 * 
+	 * @param configPath path to the wad.properties configuration file
+	 * @throws RuntimeException if the configuration file cannot be loaded
+	 */
 	public Manager(String configPath) {
 		lastAttempts.push("");
 		lastAttempts.push("");
@@ -109,6 +143,16 @@ public class Manager {
 		return savedHashCode;
 	}
 
+	/**
+	 * Loads the vocabulary word database from the ZIP-compressed XML file.
+	 * 
+	 * Reads the wad.xml file from the ZIP archive specified in WORDS_PATH,
+	 * parses the XML structure, and populates the word map with Word objects.
+	 * Also initializes the candidate list for word review.
+	 * 
+	 * XML Structure: Elements with attributes for title (t), isNew (n) flag,
+	 * and child elements for definition (d), example (e), and attempts (a).
+	 */
 	public void load() {
 		wordMap = new LinkedHashMap<String, Word>();
 		Document xmlDoc = loadXml(WORDS_PATH);
@@ -158,6 +202,15 @@ public class Manager {
 		savedHashCode = getDataHashCode();
 	}
 
+	/**
+	 * Saves the current vocabulary and learning state to a ZIP-compressed XML file.
+	 * 
+	 * Serializes the word map and graduated count into XML format,
+	 * then compresses and writes to the file at WORDS_PATH.
+	 * Updates the savedHashCode to reflect the current state.
+	 * 
+	 * @throws RuntimeException if XML generation or file I/O fails
+	 */
 	public void save() {
 		try {
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -197,6 +250,17 @@ public class Manager {
 		savedHashCode = getDataHashCode();
 	}
 
+	/**
+	 * Adds a new word to the vocabulary database after validation.
+	 * 
+	 * Validates that the word has a title, definition, and doesn't already exist.
+	 * Shows error dialogs for validation failures. If successful, adds the word
+	 * to the wordMap and updates the candidate list.
+	 * 
+	 * @param word the Word object to add
+	 * @param includeNew whether to include new words in the candidate list
+	 * @return true if word was successfully added, false if validation failed
+	 */
 	public boolean addWord(Word word, boolean includeNew) {
 		if (word.title == null || word.title.length() == 0) {
 			JOptionPane.showMessageDialog(null, "Missing title");
@@ -215,10 +279,28 @@ public class Manager {
 		return true;
 	}
 
+	/**
+	 * Removes a word from the vocabulary database.
+	 * 
+	 * @param wordTitle the title of the word to remove
+	 */
 	public void removeWord(String wordTitle) {
 		wordMap.remove(wordTitle);
 	}
 
+	/**
+	 * Records an attempt at learning a word and updates its status.
+	 * 
+	 * If the attempt is correct, adds the attempt date to the word's history.
+	 * Checks for graduation (word mastered after sufficient time). If correct attempts
+	 * indicate graduation, removes the word from active learning and increments
+	 * graduated count. If incorrect, clears the attempt history to restart learning.
+	 * 
+	 * @param wordTitle the title of the word being attempted
+	 * @param attemptDate the date/time of the attempt
+	 * @param isCorrect true if the user answered correctly, false otherwise
+	 * @return the Word object if graduated (removed), null otherwise
+	 */
 	public Word addAttempt(String wordTitle, Date attemptDate, boolean isCorrect) {
 		Word graduatedWord = null;
 		Word word = wordMap.get(wordTitle);
@@ -243,6 +325,15 @@ public class Manager {
 		return graduatedWord;
 	}
 
+	/**
+	 * Determines if a word has been sufficiently mastered for graduation.
+	 * 
+	 * A word graduates when the time span between the first and last attempts
+	 * exceeds one year (365 days), indicating long-term retention.
+	 * 
+	 * @param word the Word to check for graduation
+	 * @return true if any attempt shows the word has been learned for over a year
+	 */
 	public boolean isGraduation(Word word) {
 		Date now = new Date();
 		for (Date prevAttemptDate : word.attemptList) {
@@ -399,6 +490,13 @@ public class Manager {
 		candCount = candList.size();
 	}
 
+	/**
+	 * Prepares a list of words due for review (interval study).
+	 * 
+	 * Identifies words that have attempts and whose longest interval between
+	 * consecutive attempts is greater than 1 hour but less than 1 day.
+	 * These words are ready for intermediate-term recall review.
+	 */
 	public void prepareReviewList() {
 		reviewList = new ArrayList<Word>();
 		for (Word word : wordMap.values()) {
@@ -428,6 +526,16 @@ public class Manager {
 		}
 	}
 
+	/**
+	 * Mines new words from the dictionary for learning.
+	 * 
+	 * Compares words in the external dictionary against the "downloaded" (already attempted)
+	 * words file, randomly selects 10 new words not previously seen, and adds them
+	 * to the downloaded list. Returns a summary of the mining operation including
+	 * dictionary size, downloaded count, and remaining words.
+	 * 
+	 * @return summary string with word counts and list of newly selected words
+	 */
 	public String mine() {
 		StringBuilder selectedWords = new StringBuilder();
 		try {
@@ -480,6 +588,17 @@ public class Manager {
 		return selectedWords.toString();
 	}
 
+	/**
+	 * Updates the title of a word in the vocabulary.
+	 * 
+	 * Verifies the new title is not already in use before updating.
+	 * Shows error dialogs if the original word is not found or if the new title
+	 * conflicts with an existing word.
+	 * 
+	 * @param wordTitle the current title of the word to update
+	 * @param newTitle the new title for the word
+	 * @return true if the title was successfully updated, false if update failed
+	 */
 	public boolean updateTitle(String wordTitle, String newTitle) {
 		boolean isUpdated = false;
 		Word word = wordMap.get(newTitle);
@@ -501,6 +620,11 @@ public class Manager {
 		return isUpdated;
 	}
 
+	/**
+	 * Counts the number of words marked as "new" (not yet in active learning).
+	 * 
+	 * @return the number of new words in the vocabulary that haven't been initiated
+	 */
 	public int getRemainingNewCount() {
 		int retCount = 0;
 		for (Word word : wordMap.values()) {
@@ -511,6 +635,12 @@ public class Manager {
 		return retCount;
 	}
 
+	/**
+	 * Retrieves a word from the vocabulary by title.
+	 * 
+	 * @param wordTitle the exact title of the word to find
+	 * @return the Word object if found, null otherwise
+	 */
 	public Word findWord(String wordTitle) {
 		return wordMap.get(wordTitle);
 	}

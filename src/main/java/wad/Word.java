@@ -3,6 +3,22 @@ package wad;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * Represents a word entry in the vocabulary database.
+ * 
+ * A Word contains the vocabulary term, its definition, usage examples,
+ * a flag indicating if it's newly added, and a history of review attempts.
+ * 
+ * Implementation Notes:
+ * <ul>
+ *   <li>Title and definition follow the pattern of word ~ example usage</li>
+ *   <li>Example field contains inflected forms or related words</li>
+ *   <li>Attempt timestamps are recorded each time the word is reviewed</li>
+ *   <li>Implements proper equals() and hashCode() for use in collections</li>
+ * </ul>
+ * 
+ * @since 1.0
+ */
 public class Word {
 	public String title;
 	public String definition;
